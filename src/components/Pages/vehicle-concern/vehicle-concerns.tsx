@@ -1,19 +1,30 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import type { ChangeEvent as ReactChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import SectionOne from "./sections/section-one";
+import type { SectionOneRef } from "./sections/section-one";
 import "./vehicle-concerns.css";
 
 const VehicleConcern: React.FC = () => {
-  const [licensePlate, setLicensePlate] = useState<string>("");
-  const [selectedOption, setSelectedOption] = useState<string>("");
-  const [image, setImage] = useState<File | null>(null);
+  const navigate = useNavigate();
+  const sectionOneRef = useRef<SectionOneRef>(null);
+
+  // ✅ Step control
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [position, setPosition] = useState({
     lat: 37.3382, // Default: San Jose
     lng: -121.8863,
   });
 
+  // ✅ Step 1 States
+  const [licensePlate, setLicensePlate] = useState("");
+  const [vehicleOption, setVehicleOption] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
+  const [vehicleColor, setVehicleColor] = useState("");
+  const [vehicleMake, setVehicleMake] = useState("");
+  const [vehicleModel, setVehicleModel] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [address, setAddress] = useState("");
 
   const containerStyle = {
@@ -32,39 +43,67 @@ const VehicleConcern: React.FC = () => {
     // Optional: Reverse geocode here
   };
 
-  // Step 1: License Plate Input
-  const handleInputChange = (e: ReactChangeEvent<HTMLInputElement>) => {
-    setLicensePlate(e.target.value);
+  const [errors, setErrors] = useState<any>({});
+
+  // ✅ License Plate Validation
+  const validateLicensePlate = (plate: string) => {
+    const regex = /^[A-Z0-9]{1,7}$/i;
+    return regex.test(plate);
   };
 
-  const navigate = useNavigate();
-
-  // Step 2: Radio Buttons selection
+  // ✅ Radio change
   const handleRadioChange = (e: ReactChangeEvent<HTMLInputElement>) => {
-    setSelectedOption(e.target.value);
+    const value = e.target.value;
+    setVehicleOption(value);
+
+    if (value) {
+      setLicensePlate("");
+    }
   };
 
-  // Step 3: File Upload (Image)
+  const handleStepClick = (step: number) => {
+    if (step < currentStep) {
+      setCurrentStep(step); // Only allow navigating to a previous step
+    }
+  };
+
+  // ✅ File Upload
   const handleFileChange = (e: ReactChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
     }
   };
 
-  // Move to next step
+  // ✅ Validation
+  const validateForm = () => {
+    let newErrors: any = {};
+
+    if (!vehicleType) newErrors.vehicleType = "Vehicle type is required";
+    if (!vehicleColor) newErrors.vehicleColor = "Vehicle color is required";
+    if (!vehicleMake) newErrors.vehicleMake = "Vehicle make is required";
+
+    if (!vehicleOption) {
+      if (!licensePlate) {
+        newErrors.licensePlate = "License plate is required";
+      } else if (!validateLicensePlate(licensePlate)) {
+        newErrors.licensePlate = "Invalid license plate format";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // ✅ Next button
   const handleNext = () => {
+    if (currentStep === 1) {
+      if (!validateForm()) return;
+    }
+
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
     } else {
       navigate("/");
-      // Handle form submission or complete the flow
-    }
-  };
-
-  // Navigate directly to the clicked step (only if it's previous step or same step)
-  const handleStepClick = (step: number) => {
-    if (step < currentStep) {
-      setCurrentStep(step); // Only allow navigating to a previous step
     }
   };
 
@@ -73,145 +112,7 @@ const VehicleConcern: React.FC = () => {
   const renderStepForm = () => {
     switch (currentStep) {
       case 1:
-        return (
-          <>
-            <p className="instruction">
-              Click the camera icon below to scan or upload a photo of the
-              vehicle license plate: <span className="required">*</span>
-            </p>
-            <div className="camera-box">
-              <input
-                type="file"
-                accept="image/*"
-                id="upload"
-                hidden
-                onChange={handleFileChange}
-              />
-              <label htmlFor="upload" className="camera-icon">
-                📷
-              </label>
-            </div>
-            <p className="sub-text">
-              Or type in the license plate number. Do not include special
-              characters
-            </p>
-            <input
-              type="text"
-              className="input-box"
-              placeholder="Enter a license plate number"
-              value={licensePlate}
-              onChange={handleInputChange}
-            />
-
-            <div>
-              <p className="instruction">
-                Select the reason for the vehicle concern
-              </p>
-              <div className="radio-group">
-                <label>
-                  <input
-                    type="radio"
-                    name="vehicleOption"
-                    value="no-plates"
-                    checked={selectedOption === "no-plates"}
-                    onChange={handleRadioChange}
-                  />
-                  Vehicle does not have front and back license plates
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="vehicleOption"
-                    value="covered"
-                    checked={selectedOption === "covered"}
-                    onChange={handleRadioChange}
-                  />
-                  License plate is covered
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="vehicleOption"
-                    value="dont-have"
-                    checked={selectedOption === "dont-have"}
-                    onChange={handleRadioChange}
-                  />
-                  I don't have the license plate number
-                </label>
-              </div>
-            </div>
-
-            {/* Dropdowns for Vehicle Information */}
-            <div className="dropdowns">
-              <div className="mb-3">
-                <label htmlFor="vehicleType">Vehicle Type</label>
-                <select
-                  id="vehicleType"
-                  className="form-select"
-                  onChange={(e) => setSelectedOption(e.target.value)} // Handle the dropdown value change
-                >
-                  <option value="">Select Vehicle Type</option>
-                  <option value="car">Car</option>
-                  <option value="truck">Truck</option>
-                  <option value="motorcycle">Motorcycle</option>
-                  <option value="bus">Bus</option>
-                  <option value="van">Van</option>
-                </select>
-              </div>
-
-              <div className="dropdown">
-                <label htmlFor="vehicleColor">Vehicle Color</label>
-                <select
-                  id="vehicleColor"
-                  className="form-select"
-                  onChange={(e) => setSelectedOption(e.target.value)} // Handle the dropdown value change
-                >
-                  <option value="">Select Vehicle Color</option>
-                  <option value="red">Red</option>
-                  <option value="blue">Blue</option>
-                  <option value="black">Black</option>
-                  <option value="white">White</option>
-                  <option value="gray">Gray</option>
-                  <option value="green">Green</option>
-                </select>
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="vehicleMake">Vehicle Make</label>
-                <select
-                  id="vehicleMake"
-                  className="form-select"
-                  onChange={(e) => setSelectedOption(e.target.value)} // Handle the dropdown value change
-                >
-                  <option value="">Select Vehicle Make</option>
-                  <option value="toyota">Toyota</option>
-                  <option value="ford">Ford</option>
-                  <option value="honda">Honda</option>
-                  <option value="bmw">BMW</option>
-                  <option value="chevrolet">Chevrolet</option>
-                  <option value="mercedes">Mercedes</option>
-                </select>
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="vehicleModel">Vehicle Model</label>
-                <select
-                  id="vehicleModel"
-                  className="form-select"
-                  onChange={(e) => setSelectedOption(e.target.value)} // Handle the dropdown value change
-                >
-                  <option value="">Select Vehicle Model</option>
-                  <option value="sedan">Sedan</option>
-                  <option value="coupe">Coupe</option>
-                  <option value="hatchback">Hatchback</option>
-                  <option value="convertible">Convertible</option>
-                  <option value="pickup">Pickup</option>
-                  <option value="suv">SUV</option>
-                </select>
-              </div>
-            </div>
-          </>
-        );
+        return <SectionOne ref={sectionOneRef} />;
       case 2:
         return (
           <>
