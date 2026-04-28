@@ -1,0 +1,17 @@
+.btn-color {
+  background-color: #0f766e !important;
+  border-color: #0f766e !important;
+  color: #fff !important;
+}
+
+.btn-color:hover {
+  background-color: #0d5f58 !important;
+  border-color: #0d5f58 !important;
+}
+
+.btn-color:focus,
+.btn-color:active {
+  background-color: #0d5f58 !important;
+  border-color: #0d5f58 !important;
+  box-shadow: none !important;
+}

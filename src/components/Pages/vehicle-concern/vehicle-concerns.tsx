@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import type { ChangeEvent as ReactChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import "./vehicle-concerns.css";
@@ -8,6 +9,28 @@ const VehicleConcern: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [position, setPosition] = useState({
+    lat: 37.3382, // Default: San Jose
+    lng: -121.8863,
+  });
+
+  const [address, setAddress] = useState("");
+
+  const containerStyle = {
+    width: "100%",
+    height: "400px",
+  };
+
+  const handleDragEnd = (e) => {
+    const lat = e.latLng.lat();
+    const lng = e.latLng.lng();
+
+    setPosition({ lat, lng });
+
+    console.log("Selected Location:", lat, lng);
+
+    // Optional: Reverse geocode here
+  };
 
   // Step 1: License Plate Input
   const handleInputChange = (e: ReactChangeEvent<HTMLInputElement>) => {
@@ -241,10 +264,103 @@ const VehicleConcern: React.FC = () => {
       case 3:
         return (
           <>
-            <p className="instruction">
-              Provide any additional details about the issue
-            </p>
-            <textarea className="textarea-box" placeholder="Add details here" />
+            <div className="container mt-3 mb-4">
+              {/* Question */}
+              <div className="mb-3">
+                <label className="fw-bold">
+                  Is the vehicle on a City Street?{" "}
+                  <span className="text-danger">*</span>
+                </label>
+
+                <div className="mt-2">
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="cityStreet"
+                      id="yes"
+                    />
+                    <label className="form-check-label" htmlFor="yes">
+                      Yes
+                    </label>
+                  </div>
+
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="cityStreet"
+                      id="no"
+                    />
+                    <label className="form-check-label" htmlFor="no">
+                      No
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Address Section */}
+              <div className="mb-3">
+                <label className="fw-bold">
+                  Where is it? <span className="text-danger">*</span>
+                </label>
+
+                <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
+                  (Only San Jose addresses are enforceable)
+                </p>
+
+                <ul style={{ fontSize: "13px" }}>
+                  <li>Type in the full address and click search</li>
+                  <li>or</li>
+                  <li>
+                    Drag the red pin on the map below to select the location and
+                    then click search
+                  </li>
+                </ul>
+
+                <input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Enter address"
+                />
+
+                <button className="next-btn mb-3 search-btn">
+                  <span>Search (required)</span>
+                  <span className="icon">🔍</span>
+                </button>
+              </div>
+
+              {/* Map (Image Placeholder) */}
+              <div className="mb-3">
+                <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
+                  <GoogleMap
+                    mapContainerStyle={containerStyle}
+                    center={position}
+                    zoom={13}
+                  >
+                    <Marker
+                      position={position}
+                      draggable={true}
+                      onDragEnd={handleDragEnd}
+                    />
+                  </GoogleMap>
+                </LoadScript>
+              </div>
+
+              {/* Additional Info */}
+              <div>
+                <label className="fw-semibold">Tell us more</label>
+                <p className="text-muted" style={{ fontSize: "13px" }}>
+                  e.g. nearest intersection
+                </p>
+
+                <textarea
+                  className="form-control"
+                  rows={3}
+                  placeholder="Add details here"
+                />
+              </div>
+            </div>
           </>
         );
       case 4:
