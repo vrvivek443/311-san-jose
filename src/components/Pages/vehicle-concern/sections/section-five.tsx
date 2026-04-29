@@ -12,7 +12,7 @@ const SectionFive = forwardRef<SectionFiveRef>((_, ref) => {
   useImperativeHandle(ref, () => ({
     validate() {
       if (!selected) {
-        setError("Please select an option");
+        setError("Please select at least one option");
         return false;
       }
       setError("");
@@ -21,37 +21,68 @@ const SectionFive = forwardRef<SectionFiveRef>((_, ref) => {
   }));
 
   const options = [
-    "Parked > 10 days",
-    "Trailer",
-    "No Parking zone",
-    "Fire hydrant",
-    "Blocking sidewalk",
+    "Vehicle is parked without moving for 10 or more consecutive days.",
+    "Unattached trailer e.g. 5th wheel, boat, utility trailer",
+    "No Parking/ No Parking Certain Times/ Time Limit",
+    "Fire Hydrant/ Fire Lane",
+    "Blocking sidewalk, access ramp, crosswalk, bus lane, traffic",
     "Disabled parking",
+    "Freight/ passenger loading zone",
     "Bike lane",
+    "Permit parking",
+    "Paid/ metered parking",
   ];
 
   return (
-    <div className="container mt-3">
-      <h5 className="fw-bold">Select issue *</h5>
+    <div className="container mt-3 mb-4">
+      {/* Title */}
+      <h5 className="fw-bold">
+        Please select at least one option that describes the vehicle
+        (parked on a city street) you are reporting:
+        <span className="text-danger"> *</span>
+      </h5>
 
-      {options.map((opt, i) => (
-        <div key={i} className="form-check">
-          <input
-            type="radio"
-            onChange={() => setSelected(opt)}
-          />
-          <label>{opt}</label>
-        </div>
-      ))}
+      <p className="text-muted">
+        Choose one option that best describes the issue.
+      </p>
 
-      <textarea
-        className="form-control mt-3"
-        placeholder="Additional info"
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-      />
+      {/* Options List */}
+      <div className="list-group mb-3">
+        {options.map((option, index) => (
+          <label
+            key={index}
+            className="list-group-item list-group-item-action d-flex gap-2 align-items-start"
+            style={{ cursor: "pointer" }}
+          >
+            <input
+              className="form-check-input mt-1"
+              type="radio"
+              name="case5Option"
+              value={option}
+              checked={selected === option}
+              onChange={() => setSelected(option)}
+            />
+            <span>{option}</span>
+          </label>
+        ))}
+      </div>
 
+      {/* Error */}
       {error && <p className="text-danger">{error}</p>}
+
+      {/* Additional Info */}
+      <div className="mb-3">
+        <label className="fw-semibold mb-2">
+          Additional Information - If any
+        </label>
+        <textarea
+          className="form-control"
+          rows={3}
+          placeholder="Type in Text"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
+      </div>
     </div>
   );
 });
