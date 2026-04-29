@@ -156,7 +156,6 @@ const SectionOne = forwardRef<SectionOneRef>((_, ref) => {
           value={vehicleType}
           onChange={(e) => setVehicleType(e.target.value)}
         >
-          <option value="">Select Vehicle Type</option>
           <option value="car">Car</option>
           <option value="truck">Truck</option>
         </select>
@@ -174,7 +173,6 @@ const SectionOne = forwardRef<SectionOneRef>((_, ref) => {
           value={vehicleColor}
           onChange={(e) => setVehicleColor(e.target.value)}
         >
-          <option value="">Select Color</option>
           <option value="red">Red</option>
           <option value="black">Black</option>
         </select>
@@ -192,7 +190,6 @@ const SectionOne = forwardRef<SectionOneRef>((_, ref) => {
           value={vehicleMake}
           onChange={(e) => setVehicleMake(e.target.value)}
         >
-          <option value="">Select Make</option>
           <option value="toyota">Toyota</option>
           <option value="ford">Ford</option>
         </select>

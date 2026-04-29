@@ -22,57 +22,20 @@ const VehicleConcern: React.FC = () => {
   const sectionThreeRef = useRef<SectionThreeRef>(null);
   const sectionFourRef = useRef<SectionFourRef>(null);
   const sectionFiveRef = useRef<SectionFiveRef>(null);
+  const [section4Value, setSection4Value] = useState("");
 
   // ✅ Step control
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [position, setPosition] = useState({
-    lat: 37.3382, // Default: San Jose
-    lng: -121.8863,
-  });
 
   // ✅ Step 1 States
-  const [licensePlate, setLicensePlate] = useState("");
-  const [vehicleOption, setVehicleOption] = useState("");
-  const [vehicleType, setVehicleType] = useState("");
-  const [vehicleColor, setVehicleColor] = useState("");
-  const [vehicleMake, setVehicleMake] = useState("");
-  const [vehicleModel, setVehicleModel] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-  const [address, setAddress] = useState("");
-
   const containerStyle = {
     width: "100%",
     height: "400px",
   };
 
-  const handleDragEnd = (e) => {
-    const lat = e.latLng.lat();
-    const lng = e.latLng.lng();
-
-    setPosition({ lat, lng });
-
-    console.log("Selected Location:", lat, lng);
-
-    // Optional: Reverse geocode here
-  };
-
   const [errors, setErrors] = useState<any>({});
 
   // ✅ License Plate Validation
-  const validateLicensePlate = (plate: string) => {
-    const regex = /^[A-Z0-9]{1,7}$/i;
-    return regex.test(plate);
-  };
-
-  // ✅ Radio change
-  const handleRadioChange = (e: ReactChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setVehicleOption(value);
-
-    if (value) {
-      setLicensePlate("");
-    }
-  };
 
   const handleStepClick = (step: number) => {
     if (step < currentStep) {
@@ -81,59 +44,34 @@ const VehicleConcern: React.FC = () => {
   };
 
   // ✅ File Upload
-  const handleFileChange = (e: ReactChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
 
   // ✅ Validation
-  const validateForm = () => {
-    let newErrors: any = {};
-
-    if (!vehicleType) newErrors.vehicleType = "Vehicle type is required";
-    if (!vehicleColor) newErrors.vehicleColor = "Vehicle color is required";
-    if (!vehicleMake) newErrors.vehicleMake = "Vehicle make is required";
-
-    if (!vehicleOption) {
-      if (!licensePlate) {
-        newErrors.licensePlate = "License plate is required";
-      } else if (!validateLicensePlate(licensePlate)) {
-        newErrors.licensePlate = "Invalid license plate format";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const stepValidationMap: Record<number, () => boolean | undefined> = {
-  1: () => sectionOneRef.current?.validate(),
-  2: () => sectionTwoRef.current?.validate(),
-  3: () => sectionThreeRef.current?.validate(),
-  4: () => sectionFourRef.current?.validate(),
-  5: () => sectionFiveRef.current?.validate(),
-  6: () => true, // final step usually no validation
-};
+    1: () => sectionOneRef.current?.validate(),
+    2: () => sectionTwoRef.current?.validate(),
+    3: () => sectionThreeRef.current?.validate(),
+    4: () => sectionFourRef.current?.validate(),
+    5: () => sectionFiveRef.current?.validate(),
+    6: () => true, // final step usually no validation
+  };
 
   // ✅ Next button
   const handleNext = () => {
-  const validateCurrentStep = stepValidationMap[currentStep];
+    const validateCurrentStep = stepValidationMap[currentStep];
 
-  if (validateCurrentStep) {
-    const isValid = validateCurrentStep();
-    if (!isValid) return;
-  }
+    if (validateCurrentStep) {
+      const isValid = validateCurrentStep();
+      if (!isValid) return;
+    }
 
-  if (currentStep < 6) {
-    setCurrentStep((prev) => prev + 1);
-  } else {
-    navigate("/");
-  }
-};
+    if (currentStep < 6) {
+      setCurrentStep((prev) => prev + 1);
+    } else {
+      navigate("/");
+    }
+  };
 
-  // Render different forms based on the current step
-  // Step 1: License Plate Input
   const renderStepForm = () => {
     switch (currentStep) {
       case 1:
@@ -143,9 +81,9 @@ const VehicleConcern: React.FC = () => {
       case 3:
         return <SectionThree ref={sectionThreeRef} />;
       case 4:
-        return <SectionFour ref={sectionFourRef} />;
+        return <SectionFour ref={sectionFourRef} onChange={setSection4Value} />;
       case 5:
-        return <SectionFive ref={sectionFiveRef} />;
+        return <SectionFive ref={sectionFiveRef} section4Value={section4Value}/>;
       case 6:
         return <SectionSix />;
       default:
@@ -178,7 +116,7 @@ const VehicleConcern: React.FC = () => {
 
       {/* Next Button */}
       <button className="next-btn" onClick={handleNext}>
-        {currentStep === 6 ? "Go Home" : "Next"}
+        {currentStep === 6 ? "Go Home" : currentStep === 5 ? "Submit" : "Next"}
       </button>
     </div>
   );
