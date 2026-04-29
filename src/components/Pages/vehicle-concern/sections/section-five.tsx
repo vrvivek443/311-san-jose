@@ -1,7 +1,6 @@
 import React, {
   forwardRef,
   useImperativeHandle,
-  useState,
   useMemo,
 } from "react";
 
@@ -10,41 +9,45 @@ export interface SectionFiveRef {
 }
 
 interface SectionFiveProps {
-  section4Value: string; // 🔥 receive from parent
+  section4Value: string;
+  data: {
+    selected: string;
+    notes: string;
+  };
+  onChange: (data: any) => void;
 }
 
 const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
-  ({ section4Value }, ref) => {
-    const [selected, setSelected] = useState("");
-    const [notes, setNotes] = useState("");
-    const [error, setError] = useState("");
+  ({ section4Value, data, onChange }, ref) => {
+    const [error, setError] = React.useState("");
 
     const headerConfig = useMemo(() => {
       switch (section4Value) {
         case "LIV":
-          return {
-            title: "Please select at least one option that applies to the vehicle you are reporting:",
-          };
-
         case "TRA":
           return {
-            title: "Please select at least one option that applies to the vehicle you are reporting:",
+            title:
+              "Please select at least one option that applies to the vehicle you are reporting:",
           };
 
         case "PAR":
           return {
-            title: "If the vehicle is in a park, creek or a trail, select at least one option that applies to the vehicle you are reporting:",
+            title:
+              "If the vehicle is in a park, creek or a trail, select at least one option that applies to the vehicle you are reporting:",
           };
 
         case "PRI":
           return {
-            title: "If the vehicle is on a residential private property, select at least one option that applies to the vehicle you are reporting:",
+            title:
+              "If the vehicle is on a residential private property, select at least one option that applies to the vehicle you are reporting:",
           };
 
         case "POO":
           return {
-            title: "Vehicles will be investigated if they meet one of these qualifying conditions:",
-            description: "Select one option that best describes the problem you are reporting.",
+            title:
+              "Vehicles will be investigated if they meet one of these qualifying conditions:",
+            description:
+              "Select one option that best describes the problem you are reporting.",
           };
 
         case "ISS":
@@ -55,8 +58,10 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
 
         case "CRI":
           return {
-            title: "What potential criminal activity did you witness involving this vehicle? Please describe:",
-            description: "Always put your safety first. Gather information discreetly. Never confront suspicious persons.",
+            title:
+              "What potential criminal activity did you witness involving this vehicle? Please describe:",
+            description:
+              "Always put your safety first. Gather information discreetly. Never confront suspicious persons.",
           };
 
         default:
@@ -69,7 +74,7 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
 
     const options = useMemo(() => {
       switch (section4Value) {
-        case "LIV": // Lived-in vehicle
+        case "LIV":
           return [
             "I have seen a person(s) living/ going in and out of the vehicle.",
             "RV with trash around it - assumed that people are living in it.",
@@ -82,7 +87,7 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
             "Trash/ items outside of the vehicle on the sidewalk or in the street",
           ];
 
-        case "PAR": // your existing UI case
+        case "PAR":
           return [
             "The vehicle looks abandoned/ undrivable (but no-one is living in it)",
             "The vehicle is burned (but no-one is living in it)",
@@ -95,7 +100,7 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
             "Commercial vehicle with gross vehicle weight over 10,000 pounds",
             "Unmounted camper shell visible from the street",
             "Inoperable vehicle stored on private property visible from the street",
-            "Vehicle or boat being stored in the rear/side yard of a residential property within 5 feet of a property line",
+            "Vehicle or boat being stored in the rear/side yard of a residential property within 5 feet of a property line",
             "Person running an auto repair business from home",
             "Person living in RV or their vehicle for over 72 hours",
             "Vehicle parked on unpaved surface, front yard or lawn",
@@ -143,10 +148,9 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
       }
     }, [section4Value]);
 
-    // ✅ Validation
     useImperativeHandle(ref, () => ({
       validate() {
-        if (!selected) {
+        if (!data.selected) {
           setError("Please select at least one option");
           return false;
         }
@@ -157,7 +161,6 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
 
     return (
       <div className="container mt-3 mb-4">
-        {/* Title */}
         <h5 className="fw-bold">
           {headerConfig.title}
           <span className="text-danger"> *</span>
@@ -167,7 +170,6 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
           <p className="text-muted">{headerConfig.description}</p>
         )}
 
-        {/* Options */}
         <div className="list-group mb-3">
           {options.length > 0 ? (
             options.map((option, index) => (
@@ -181,8 +183,10 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
                   type="radio"
                   name="case5Option"
                   value={option}
-                  checked={selected === option}
-                  onChange={() => setSelected(option)}
+                  checked={data.selected === option}
+                  onChange={() =>
+                    onChange({ ...data, selected: option })
+                  }
                 />
                 <span>{option}</span>
               </label>
@@ -192,10 +196,8 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
           )}
         </div>
 
-        {/* Error */}
         {error && <p className="text-danger">{error}</p>}
 
-        {/* Additional Info */}
         <div className="mb-3">
           <label className="fw-semibold mb-2">
             Additional Information - If any
@@ -204,8 +206,10 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
             className="form-control"
             rows={3}
             placeholder="Type in Text"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
+            value={data.notes}
+            onChange={(e) =>
+              onChange({ ...data, notes: e.target.value })
+            }
           />
         </div>
       </div>

@@ -11,7 +11,7 @@ import SectionSix from "./sections/section-six";
 import type { SectionOneRef } from "./sections/section-one";
 import type { SectionTwoRef } from "./sections/section-two";
 import type { SectionThreeRef } from "./sections/section-three";
-import type { SectionFourRef } from "./sections/section-four";
+import type { SectionFourRef, SectionFourCode } from "./sections/section-four";
 import type { SectionFiveRef } from "./sections/section-five";
 import "./vehicle-concerns.css";
 
@@ -22,30 +22,44 @@ const VehicleConcern: React.FC = () => {
   const sectionThreeRef = useRef<SectionThreeRef>(null);
   const sectionFourRef = useRef<SectionFourRef>(null);
   const sectionFiveRef = useRef<SectionFiveRef>(null);
-  const [section4Value, setSection4Value] = useState("");
+  const [sectionOneData, setSectionOneData] = useState({
+    licensePlate: "",
+    vehicleOption: "",
+    vehicleType: "",
+    vehicleColor: "",
+    vehicleMake: "",
+    vehicleModel: "",
+  });
+  const [sectionTwoData, setSectionTwoData] = useState({
+    image: null as File | null,
+    noPhoto: false,
+  });
+  const [sectionFiveData, setSectionFiveData] = useState({
+    selected: "",
+    notes: "",
+  });
+  const [sectionThreeData, setSectionThreeData] = useState({
+    cityStreet: "",
+    address: "",
+    additionalInfo: "",
+    position: {
+      lat: 37.3382,
+      lng: -121.8863,
+    },
+  });
+  const [sectionFourData, setSectionFourData] = useState<SectionFourCode | "">(
+    "",
+  );
 
-  // ✅ Step control
   const [currentStep, setCurrentStep] = useState<number>(1);
 
-  // ✅ Step 1 States
-  const containerStyle = {
-    width: "100%",
-    height: "400px",
-  };
-
-  const [errors, setErrors] = useState<any>({});
-
-  // ✅ License Plate Validation
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleStepClick = (step: number) => {
     if (step < currentStep) {
-      setCurrentStep(step); // Only allow navigating to a previous step
+      setCurrentStep(step);
     }
   };
-
-  // ✅ File Upload
-
-  // ✅ Validation
 
   const stepValidationMap: Record<number, () => boolean | undefined> = {
     1: () => sectionOneRef.current?.validate(),
@@ -65,6 +79,27 @@ const VehicleConcern: React.FC = () => {
       if (!isValid) return;
     }
 
+    if (currentStep === 5) {
+      const finalData = {
+        sectionOneData,
+        sectionTwoData,
+        sectionThreeData,
+        sectionFourData,
+        sectionFiveData,
+      };
+
+      console.log("Final Submitted Data:", finalData);
+
+      setIsSubmitting(true);
+
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setCurrentStep(6); // move after loader
+      }, 5000);
+
+      return;
+    }
+
     if (currentStep < 6) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -75,15 +110,46 @@ const VehicleConcern: React.FC = () => {
   const renderStepForm = () => {
     switch (currentStep) {
       case 1:
-        return <SectionOne ref={sectionOneRef} />;
+        return (
+          <SectionOne
+            ref={sectionOneRef}
+            data={sectionOneData}
+            onChange={setSectionOneData}
+          />
+        );
       case 2:
-        return <SectionTwo ref={sectionTwoRef} />;
+        return (
+          <SectionTwo
+            ref={sectionTwoRef}
+            data={sectionTwoData}
+            onChange={setSectionTwoData}
+          />
+        );
       case 3:
-        return <SectionThree ref={sectionThreeRef} />;
+        return (
+          <SectionThree
+            ref={sectionThreeRef}
+            data={sectionThreeData}
+            onChange={setSectionThreeData}
+          />
+        );
       case 4:
-        return <SectionFour ref={sectionFourRef} onChange={setSection4Value} />;
+        return (
+          <SectionFour
+            ref={sectionFourRef}
+            data={sectionFourData}
+            onChange={setSectionFourData}
+          />
+        );
       case 5:
-        return <SectionFive ref={sectionFiveRef} section4Value={section4Value}/>;
+        return (
+          <SectionFive
+            ref={sectionFiveRef}
+            section4Value={sectionFourData}
+            data={sectionFiveData}
+            onChange={setSectionFiveData}
+          />
+        );
       case 6:
         return <SectionSix />;
       default:
@@ -118,6 +184,15 @@ const VehicleConcern: React.FC = () => {
       <button className="next-btn" onClick={handleNext}>
         {currentStep === 6 ? "Go Home" : currentStep === 5 ? "Submit" : "Next"}
       </button>
+
+      {isSubmitting && (
+        <div className="loader-overlay">
+          <div className="loader-box">
+            <div className="spinner"></div>
+            <p>Submitting your report...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

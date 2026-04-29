@@ -10,24 +10,24 @@ export interface SectionFourRef {
 
 // ✅ Simple short codes
 export type SectionFourCode =
-  | "LIV" // Lived-in vehicle
-  | "TRA" // Trash/sewage
-  | "PAR" // Park/creek
-  | "PRI" // Private property
-  | "POO" // Poor condition
-  | "ISS" // Parking issue
-  | "CRI"; // Criminal activity
+  | "LIV"
+  | "TRA"
+  | "PAR"
+  | "PRI"
+  | "POO"
+  | "ISS"
+  | "CRI";
 
 interface SectionFourProps {
+  data: SectionFourCode | ""; // 🔥 from parent
   onChange: (value: SectionFourCode) => void;
 }
 
 const SectionFour = forwardRef<SectionFourRef, SectionFourProps>(
-  ({ onChange }, ref) => {
-    const [selected, setSelected] = useState<SectionFourCode | "">("");
+  ({ data, onChange }, ref) => {
     const [error, setError] = useState("");
 
-    // ✅ Code + Label mapping
+    // ✅ Code + Label mapping (UNCHANGED)
     const options: { code: SectionFourCode; label: string }[] = [
       { code: "LIV", label: "Lived-in vehicle" },
       {
@@ -54,14 +54,14 @@ const SectionFour = forwardRef<SectionFourRef, SectionFourProps>(
     ];
 
     const handleChange = (code: SectionFourCode) => {
-      setSelected(code);
-      onChange(code); // 🔥 send short code
+      onChange(code); // 🔥 parent state
       setError("");
     };
 
+    // ✅ Validation
     useImperativeHandle(ref, () => ({
       validate() {
-        if (!selected) {
+        if (!data) {
           setError("Please select a concern");
           return false;
         }
@@ -87,7 +87,7 @@ const SectionFour = forwardRef<SectionFourRef, SectionFourProps>(
             <label
               key={option.code}
               className={`list-group-item list-group-item-action d-flex gap-2 ${
-                selected === option.code ? "active" : ""
+                data === option.code ? "active" : ""
               }`}
               style={{ cursor: "pointer" }}
             >
@@ -95,7 +95,7 @@ const SectionFour = forwardRef<SectionFourRef, SectionFourProps>(
                 className="form-check-input mt-1"
                 type="radio"
                 name="vehicleConcern"
-                checked={selected === option.code}
+                checked={data === option.code}
                 onChange={() => handleChange(option.code)}
               />
               <span>{option.label}</span>
