@@ -23,7 +23,8 @@ const Modal: React.FC<ModalProps> = ({
   if (!show) return null;
 
   return (
-    <div className="modal fade show d-block" tabIndex={-1}>
+  <div className="modal-backdrop-custom">
+    <div className="modal fade show d-block modal-custom" tabIndex={-1}>
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
 
@@ -60,9 +61,9 @@ const Modal: React.FC<ModalProps> = ({
 
         </div>
       </div>
-
     </div>
-  );
+  </div>
+);
 };
 
 export default Modal;

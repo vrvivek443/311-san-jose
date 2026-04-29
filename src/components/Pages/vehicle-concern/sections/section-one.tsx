@@ -4,6 +4,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
+import Modal from "../../../shared/modal/modal"; // ✅ import your modal
 
 export interface SectionOneRef {
   validate: () => boolean;
@@ -26,6 +27,10 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
     const [errors, setErrors] = useState<any>({});
     const [showFullForm, setShowFullForm] = useState(false);
 
+    // ✅ Modal state (LOCAL)
+    const [showModal, setShowModal] = useState(false);
+    const [disablePlateInput, setDisablePlateInput] = useState(false);
+
     const {
       licensePlate,
       vehicleOption,
@@ -35,7 +40,7 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
       vehicleModel,
     } = data;
 
-    // ✅ Detect if user came back (retain full form)
+    // ✅ Detect return navigation (DO NOT hide form)
     useEffect(() => {
       if (
         licensePlate ||
@@ -49,7 +54,6 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
       }
     }, []);
 
-    // ✅ License Plate Validation
     const validateLicensePlate = (plate: string) => {
       const regex = /^[A-Z0-9]{1,7}$/;
       return regex.test(plate);
@@ -64,13 +68,15 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
         licensePlate: "",
       });
 
-      // ✅ Reveal rest of form on first interaction
+      // ✅ Show modal on selection
+      setShowModal(true);
+
+      // ✅ Reveal rest of form
       if (!showFullForm) {
         setShowFullForm(true);
       }
     };
 
-    // ✅ Expose validation
     useImperativeHandle(ref, () => ({
       validate() {
         let newErrors: any = {};
@@ -94,6 +100,26 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
 
     return (
       <>
+        <Modal
+          show={showModal}
+          onClose={() => setShowModal(false)}
+          message="Providing a License plate number help us locate the vehicle faster. We prioritize investigating reports that include all requested information including full LPN and a photo"
+          primaryText="Provide a license plate number"
+          secondaryText="Continue without a license plate number"
+          onPrimary={() => {
+            onChange({
+              ...data,
+              vehicleOption: "",
+            });
+            setDisablePlateInput(false);
+            setShowModal(false);
+          }}
+          onSecondary={() => {
+            setDisablePlateInput(true);
+            setShowModal(false);
+          }}
+        />
+
         {/* License Plate */}
         <div className="mb-3">
           <label className="form-label fw-semibold">
@@ -102,8 +128,8 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
           </label>
 
           <p className="text-muted mt-2" style={{ fontSize: "13px" }}>
-            Please make sure the license plate and outline of the vehicle's shape
-            are visible.
+            Please make sure the license plate and outline of the vehicle's
+            shape are visible.
           </p>
 
           <div className="camera-box text-center">
@@ -116,7 +142,6 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
                 if (e.target.files && e.target.files[0]) {
                   console.log("Selected file:", e.target.files[0]);
 
-                  // ✅ Reveal rest of form on interaction
                   if (!showFullForm) {
                     setShowFullForm(true);
                   }
@@ -130,7 +155,8 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
           </div>
 
           <p className="text-muted mt-2" style={{ fontSize: "13px" }}>
-            Or type in the license plate number. Do not include special characters
+            Or type in the license plate number. Do not include special
+            characters
           </p>
         </div>
 
@@ -140,6 +166,7 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
             className="form-control"
             placeholder="Enter license plate"
             value={licensePlate}
+            disabled={disablePlateInput}
             onChange={(e) => {
               const value = e.target.value.toUpperCase();
 
@@ -148,7 +175,6 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
                 licensePlate: value,
               });
 
-              // ✅ Reveal rest of form on first input
               if (!showFullForm) {
                 setShowFullForm(true);
               }
@@ -204,7 +230,7 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
           </div>
         </div>
 
-        {/* ✅ Remaining fields (conditionally shown) */}
+        {/* Remaining fields */}
         {showFullForm && (
           <>
             <div className="mb-3">
@@ -283,7 +309,7 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
         )}
       </>
     );
-  }
+  },
 );
 
 export default SectionOne;
