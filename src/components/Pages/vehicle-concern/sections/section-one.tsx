@@ -1,4 +1,9 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useEffect,
+} from "react";
 
 export interface SectionOneRef {
   validate: () => boolean;
@@ -19,6 +24,7 @@ interface SectionOneProps {
 const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
   ({ data, onChange }, ref) => {
     const [errors, setErrors] = useState<any>({});
+    const [showFullForm, setShowFullForm] = useState(false);
 
     const {
       licensePlate,
@@ -28,6 +34,20 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
       vehicleMake,
       vehicleModel,
     } = data;
+
+    // ✅ Detect if user came back (retain full form)
+    useEffect(() => {
+      if (
+        licensePlate ||
+        vehicleOption ||
+        vehicleType ||
+        vehicleColor ||
+        vehicleMake ||
+        vehicleModel
+      ) {
+        setShowFullForm(true);
+      }
+    }, []);
 
     // ✅ License Plate Validation
     const validateLicensePlate = (plate: string) => {
@@ -41,8 +61,13 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
       onChange({
         ...data,
         vehicleOption: value,
-        licensePlate: "", // reset like before
+        licensePlate: "",
       });
+
+      // ✅ Reveal rest of form on first interaction
+      if (!showFullForm) {
+        setShowFullForm(true);
+      }
     };
 
     // ✅ Expose validation
@@ -90,6 +115,11 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
                   console.log("Selected file:", e.target.files[0]);
+
+                  // ✅ Reveal rest of form on interaction
+                  if (!showFullForm) {
+                    setShowFullForm(true);
+                  }
                 }
               }}
             />
@@ -110,12 +140,19 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
             className="form-control"
             placeholder="Enter license plate"
             value={licensePlate}
-            onChange={(e) =>
+            onChange={(e) => {
+              const value = e.target.value.toUpperCase();
+
               onChange({
                 ...data,
-                licensePlate: e.target.value.toUpperCase(),
-              })
-            }
+                licensePlate: value,
+              });
+
+              // ✅ Reveal rest of form on first input
+              if (!showFullForm) {
+                setShowFullForm(true);
+              }
+            }}
           />
           {errors.licensePlate && (
             <p className="text-danger">{errors.licensePlate}</p>
@@ -167,80 +204,83 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
           </div>
         </div>
 
-        {/* Dropdowns */}
-        <div className="mb-3">
-          <label className="form-label fw-semibold">
-            Vehicle Type <span className="text-danger">*</span>
-          </label>
-          <select
-            className="form-select"
-            value={vehicleType}
-            onChange={(e) =>
-              onChange({ ...data, vehicleType: e.target.value })
-            }
-          >
-            <option value="">Select Vehicle Type</option>
-            <option value="car">Car</option>
-            <option value="truck">Truck</option>
-          </select>
-          {errors.vehicleType && (
-            <p className="text-danger">{errors.vehicleType}</p>
-          )}
-        </div>
+        {/* ✅ Remaining fields (conditionally shown) */}
+        {showFullForm && (
+          <>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">
+                Vehicle Type <span className="text-danger">*</span>
+              </label>
+              <select
+                className="form-select"
+                value={vehicleType}
+                onChange={(e) =>
+                  onChange({ ...data, vehicleType: e.target.value })
+                }
+              >
+                <option value="">Select Vehicle Type</option>
+                <option value="car">Car</option>
+                <option value="truck">Truck</option>
+              </select>
+              {errors.vehicleType && (
+                <p className="text-danger">{errors.vehicleType}</p>
+              )}
+            </div>
 
-        <div className="mb-3">
-          <label className="form-label fw-semibold">
-            Vehicle Color <span className="text-danger">*</span>
-          </label>
-          <select
-            className="form-select"
-            value={vehicleColor}
-            onChange={(e) =>
-              onChange({ ...data, vehicleColor: e.target.value })
-            }
-          >
-            <option value="">Select Color</option>
-            <option value="red">Red</option>
-            <option value="black">Black</option>
-          </select>
-          {errors.vehicleColor && (
-            <p className="text-danger">{errors.vehicleColor}</p>
-          )}
-        </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">
+                Vehicle Color <span className="text-danger">*</span>
+              </label>
+              <select
+                className="form-select"
+                value={vehicleColor}
+                onChange={(e) =>
+                  onChange({ ...data, vehicleColor: e.target.value })
+                }
+              >
+                <option value="">Select Color</option>
+                <option value="red">Red</option>
+                <option value="black">Black</option>
+              </select>
+              {errors.vehicleColor && (
+                <p className="text-danger">{errors.vehicleColor}</p>
+              )}
+            </div>
 
-        <div className="mb-3">
-          <label className="form-label fw-semibold">
-            Vehicle Make <span className="text-danger">*</span>
-          </label>
-          <select
-            className="form-select"
-            value={vehicleMake}
-            onChange={(e) =>
-              onChange({ ...data, vehicleMake: e.target.value })
-            }
-          >
-            <option value="">Select Make</option>
-            <option value="toyota">Toyota</option>
-            <option value="ford">Ford</option>
-          </select>
-          {errors.vehicleMake && (
-            <p className="text-danger">{errors.vehicleMake}</p>
-          )}
-        </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">
+                Vehicle Make <span className="text-danger">*</span>
+              </label>
+              <select
+                className="form-select"
+                value={vehicleMake}
+                onChange={(e) =>
+                  onChange({ ...data, vehicleMake: e.target.value })
+                }
+              >
+                <option value="">Select Make</option>
+                <option value="toyota">Toyota</option>
+                <option value="ford">Ford</option>
+              </select>
+              {errors.vehicleMake && (
+                <p className="text-danger">{errors.vehicleMake}</p>
+              )}
+            </div>
 
-        {/* Optional Model */}
-        <div className="mb-3">
-          <label className="form-label fw-semibold">Vehicle Model</label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Enter vehicle model"
-            value={vehicleModel}
-            onChange={(e) =>
-              onChange({ ...data, vehicleModel: e.target.value })
-            }
-          />
-        </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Vehicle Model</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Enter vehicle model"
+                value={vehicleModel}
+                onChange={(e) =>
+                  onChange({ ...data, vehicleModel: e.target.value })
+                }
+              />
+            </div>
+          </>
+        )}
       </>
     );
   }
