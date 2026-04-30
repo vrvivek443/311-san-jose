@@ -30,6 +30,11 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
     const [errorOption, setError] = React.useState("");
     const [errorPara, setParaError] = React.useState("");
     const [showISSModal, setShowISSModal] = useState(false);
+    React.useEffect(() => {
+      if (section4Value === "ISS" && data.day && data.time) {
+        setShowISSModal(false);
+      }
+    }, [data.day, data.time, section4Value]);
 
     const livTriggerOption =
       "I have seen a person(s) living/ going in and out of the vehicle.";
@@ -166,10 +171,19 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
     const handleSelect = (option: string) => {
       setError("");
       if (section4Value === "ISS") {
-        onChange({ ...data, selected: [option] });
-        setShowISSModal(true); // ✅ Open modal
-        return;
-      }
+    onChange({ ...data, selected: [option] });
+
+    const noModalOptions = [
+      "Vehicle is parked without moving for 10 or more consecutive days.",
+      "Unattached trailer e.g. 5th wheel, boat, utility trailer",
+    ];
+
+    if (!noModalOptions.includes(option)) {
+      setShowISSModal(true); // ✅ only for other options
+    }
+
+    return;
+  }
 
       if (isSingleSelect) {
         onChange({ ...data, selected: [option] });
@@ -218,12 +232,12 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
         }
 
         // ✅ ISS validation
-        // if (section4Value === "ISS") {
-        //   if (!data.day || !data.time) {
-        //     setError("Please select day and time");
-        //     isValid = false;
-        //   }
-        // }
+        if (section4Value === "ISS") {
+    if (!data.day || !data.time) {
+      setShowISSModal(true);
+      isValid = false;
+    }
+  }
 
         // ✅ CRI validation (TEXT AREA)
         if (section4Value === "CRI") {
