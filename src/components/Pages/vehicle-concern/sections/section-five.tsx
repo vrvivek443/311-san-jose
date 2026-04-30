@@ -236,6 +236,7 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
         onChange({ ...data, selected: [code] });
 
         const noModalCodes = ["ISS_VP10", "ISS_TRAILER"];
+        console.log(!noModalCodes.includes(code));
 
         if (!noModalCodes.includes(code)) {
           setShowISSModal(true);
@@ -274,6 +275,20 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
           isValid = false;
         }
 
+        if (section4Value === "ISS") {
+          const selectedCode = data.selected[0];
+
+          const noModalCodes = ["ISS_VP10", "ISS_TRAILER"];
+
+          const requiresDateTime =
+            selectedCode && !noModalCodes.includes(selectedCode);
+
+          if (requiresDateTime && (!data.day || !data.time)) {
+            setShowISSModal(true);
+            return false;
+          }
+        }
+
         // ✅ LIV validation
         if (
           section4Value === "LIV" &&
@@ -281,14 +296,6 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
         ) {
           if (!data.day || !data.time) {
             setError("Please select day and time");
-            isValid = false;
-          }
-        }
-
-        // ✅ ISS validation
-        if (section4Value === "ISS") {
-          if (!data.day || !data.time) {
-            setShowISSModal(true);
             isValid = false;
           }
         }

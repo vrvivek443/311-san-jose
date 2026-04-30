@@ -1,6 +1,4 @@
 import React, { useRef, useState } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import type { ChangeEvent as ReactChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import SectionOne from "./sections/section-one";
 import SectionTwo from "./sections/section-two";
@@ -18,7 +16,9 @@ import "./vehicle-concerns.css";
 
 const VehicleConcern: React.FC = () => {
   const navigate = useNavigate();
-  const [showAlert, setShowAlert] = useState<null | "LIV" | "CRI">(null);
+  const [showAlert, setShowAlert] = useState<
+    null | "LIV" | "CRI" | "S5_COMMON" | "S5_OTHER"
+  >(null);
   const sectionOneRef = useRef<SectionOneRef>(null);
   const sectionTwoRef = useRef<SectionTwoRef>(null);
   const sectionThreeRef = useRef<SectionThreeRef>(null);
@@ -83,6 +83,28 @@ const VehicleConcern: React.FC = () => {
     }
 
     if (currentStep === 5) {
+      const selected = sectionFiveData.selected;
+
+      // ✅ مشتر alert for VP10 + TRAILER
+      if (selected.includes("ISS_VP10") || selected.includes("ISS_TRAILER")) {
+        setShowAlert("S5_COMMON");
+        return;
+      }
+
+      // ✅ else condition (other Section 5 selections)
+      const hasOtherISS = selected.some(
+        (code) =>
+          code.startsWith("ISS_") &&
+          code !== "ISS_VP10" &&
+          code !== "ISS_TRAILER",
+      );
+
+      if (hasOtherISS) {
+        setShowAlert("S5_OTHER");
+        return;
+      }
+
+      // ✅ default submit flow
       const finalData = {
         sectionOneData,
         sectionTwoData,
@@ -97,7 +119,7 @@ const VehicleConcern: React.FC = () => {
 
       setTimeout(() => {
         setIsSubmitting(false);
-        setCurrentStep(6); // move after loader
+        setCurrentStep(6);
       }, 5000);
 
       return;
@@ -163,6 +185,50 @@ const VehicleConcern: React.FC = () => {
             onPrimary={() => {
               setShowAlert(null);
               setCurrentStep(5);
+            }}
+            onSecondary={() => {
+              setShowAlert(null);
+            }}
+          />
+        </div>
+      );
+    }
+
+    if (showAlert === "S5_COMMON") {
+      return (
+        <div className="vehicle-container">
+          <AlertNavigation
+            description={[
+              "Please understand, when investigated, most vehicles do not qualify for enforcement action.However, if the vehicle qualifies for enforcement a citation will be issued. Vehicles cannot be legally cited just because they may be viewed as a nuisance when parked on a public street.Additionally, a vehicle cannot be cited simply because it is unsightly, damaged, dirty, or full of trash.",
+              "As part of the 2025-2026 budget, the Extended Parking Stay Enforcement program was ended.Moving forward, vehicles reported for being parked too long in one spot will no longer be investigated.",
+              "Your report will be used to help identify areas with potential parking turnover concerns and may inform future enforcement efforts.",
+            ]}
+            primaryText="I understand, submit"
+            secondaryText="Go Back"
+            onPrimary={() => {
+              setShowAlert(null);
+              setCurrentStep(6);
+            }}
+            onSecondary={() => {
+              setShowAlert(null);
+            }}
+          />
+        </div>
+      );
+    }
+
+    if (showAlert === "S5_OTHER") {
+      return (
+        <div className="vehicle-container">
+          <AlertNavigation
+            description={[
+              "The City of San Jose does not currently have an on-demand service for responding to reports of illegally parked vehicles. Your report will be used to guide rotating proactive patrols (every 14 days) aimed at enforcing illegal parking on City streets.",
+            ]}
+            primaryText="I understand, submit"
+            secondaryText="Go Back"
+            onPrimary={() => {
+              setShowAlert(null);
+              setCurrentStep(6);
             }}
             onSecondary={() => {
               setShowAlert(null);
