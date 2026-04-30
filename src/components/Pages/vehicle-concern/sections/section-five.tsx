@@ -36,8 +36,7 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
       }
     }, [data.day, data.time, section4Value]);
 
-    const livTriggerOption =
-      "I have seen a person(s) living/ going in and out of the vehicle.";
+    const livTriggerOption = "LIV_SEEN_PERSON";
 
     const isSingleSelect = section4Value === "POO" || section4Value === "ISS";
 
@@ -96,71 +95,133 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
       switch (section4Value) {
         case "LIV":
           return [
-            livTriggerOption,
-            "RV with trash around it - assumed that people are living in it.",
-            "A car with a trailer attached with trash around it - assumed that people are living in them.",
+            {
+              code: "LIV_SEEN_PERSON",
+              label:
+                "I have seen a person(s) living/ going in and out of the vehicle.",
+            },
+            {
+              code: "LIV_RV_TRASH",
+              label:
+                "RV with trash around it - assumed that people are living in it.",
+            },
+            {
+              code: "LIV_TRAILER_TRASH",
+              label:
+                "A car with a trailer attached with trash around it - assumed that people are living in them.",
+            },
           ];
 
         case "TRA":
           return [
-            "Sewage/ bio- waste leaking from/ around the vehicle",
-            "Trash/ items outside of the vehicle on the sidewalk or in the street",
+            {
+              code: "TRA_SEWAGE",
+              label: "Sewage/ bio- waste leaking from/ around the vehicle",
+            },
+            {
+              code: "TRA_TRASH",
+              label:
+                "Trash/ items outside of the vehicle on the sidewalk or in the street",
+            },
           ];
 
         case "PAR":
           return [
-            "The vehicle looks abandoned/ undrivable (but no-one is living in it)",
-            "The vehicle is burned (but no-one is living in it)",
-            "There is trash around the vehicle",
-            "The vehicle is on a trail blocking the path",
+            {
+              code: "PAR_ABANDONED",
+              label:
+                "The vehicle looks abandoned/ undrivable (but no-one is living in it)",
+            },
+            {
+              code: "PAR_BURNED",
+              label: "The vehicle is burned (but no-one is living in it)",
+            },
+            { code: "PAR_TRASH", label: "There is trash around the vehicle" },
+            {
+              code: "PAR_BLOCKING_TRAIL",
+              label: "The vehicle is on a trail blocking the path",
+            },
           ];
 
         case "PRI":
           return [
-            "Commercial vehicle with gross vehicle weight over 10,000 pounds",
-            "Unmounted camper shell visible from the street",
-            "Inoperable vehicle stored on private property visible from the street",
-            "Vehicle or boat being stored in the rear/side yard of a residential property within 5 feet of a property line",
-            "Person running an auto repair business from home",
-            "Person living in RV or their vehicle for over 72 hours",
-            "Vehicle parked on unpaved surface, front yard or lawn",
-            "Abandoned vehicle on private land",
+            {
+              code: "PRI_HEAVY_VEHICLE",
+              label:
+                "Commercial vehicle with gross vehicle weight over 10,000 pounds",
+            },
+            {
+              code: "PRI_CAMPER",
+              label: "Unmounted camper shell visible from the street",
+            },
+            {
+              code: "PRI_INOPERABLE",
+              label:
+                "Inoperable vehicle stored on private property visible from the street",
+            },
+            {
+              code: "PRI_REAR_STORAGE",
+              label: "Vehicle stored within 5 feet of property line",
+            },
+            {
+              code: "PRI_AUTO_BUSINESS",
+              label: "Person running an auto repair business from home",
+            },
+            {
+              code: "PRI_LIVING",
+              label: "Person living in RV or vehicle over 72 hours",
+            },
+            {
+              code: "PRI_LAWN",
+              label: "Vehicle parked on unpaved surface/front yard",
+            },
+            {
+              code: "PRI_ABANDONED",
+              label: "Abandoned vehicle on private land",
+            },
           ];
 
         case "POO":
           return [
-            "Burned out vehicle",
-            "On jacks/ blocks",
-            "Missing or shattered windows",
-            "Vandalized/ Graffiti (non-commercial vehicle)",
-            "With significantly flat tire(s)",
-            "Missing tire or wheel",
-            "Have deployed airbags/ Significant damage",
-            "Unsecured/ Open doors or trunk",
-            "Displaying salvage, accident, or auction markings on windshield",
-            "Displaying multiple aged or weathered citations",
-            "Attracting illegal dumping activities",
-            "Inoperable vehicles (as defined by the California Vehicle Code: missing essential parts, such as, the windshield, steering wheel, driver's seat, engine, or two or more wheels)",
+            { code: "POO_BURNED", label: "Burned out vehicle" },
+            { code: "POO_BLOCKS", label: "On jacks/ blocks" },
+            { code: "POO_WINDOWS", label: "Missing or shattered windows" },
+            { code: "POO_GRAFFITI", label: "Vandalized/ Graffiti" },
+            { code: "POO_FLAT_TIRES", label: "Flat tires" },
+            { code: "POO_MISSING_WHEEL", label: "Missing tire or wheel" },
+            { code: "POO_DAMAGE", label: "Significant damage" },
+            { code: "POO_OPEN", label: "Open doors or trunk" },
+            { code: "POO_MARKINGS", label: "Auction/salvage markings" },
+            { code: "POO_CITATIONS", label: "Multiple citations" },
+            { code: "POO_DUMPING", label: "Attracting dumping" },
+            { code: "POO_INOPERABLE", label: "Inoperable vehicle" },
           ];
 
         case "ISS":
           return [
-            "Vehicle is parked without moving for 10 or more consecutive days.",
-            "Unattached trailer e.g. 5th wheel, boat, utility trailer",
-            "No Parking/ No Parking Certain Times/ Time Limit",
-            "Fire Hydrant/ Fire Lane",
-            "Blocking sidewalk, access ramp, crosswalk, bus lane, traffic",
-            "Disabled parking",
-            "Freight/ passenger loading zone",
-            "Bike lane",
-            "Permit parking",
-            "Paid/ metered parking",
+            {
+              code: "ISS_VP10",
+              label:
+                "Vehicle is parked without moving for 10 or more consecutive days.",
+            },
+            {
+              code: "ISS_TRAILER",
+              label: "Unattached trailer e.g. 5th wheel, boat, utility trailer",
+            },
+            { code: "ISS_NOPARK", label: "No Parking / Time Limit" },
+            { code: "ISS_FIRE", label: "Fire Hydrant / Fire Lane" },
+            { code: "ISS_BLOCKING", label: "Blocking sidewalk / traffic" },
+            { code: "ISS_DISABLED", label: "Disabled parking" },
+            { code: "ISS_LOADING", label: "Loading zone" },
+            { code: "ISS_BIKE", label: "Bike lane" },
+            { code: "ISS_PERMIT", label: "Permit parking" },
+            { code: "ISS_METER", label: "Metered parking" },
           ];
 
         case "CRI":
           return [
-            "You suspect drugs being sold out of this vehicle.",
-            "You suspect prostitution/ human trafficking activity in this vehicle.",
+            { code: "CRI_DRUGS", label: "Drugs being sold" },
+            { code: "CRI_TRAFFICKING", label: "Prostitution / trafficking" },
           ];
 
         default:
@@ -168,38 +229,31 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
       }
     }, [section4Value]);
 
-    const handleSelect = (option: string) => {
+    const handleSelect = (code: string) => {
       setError("");
+
       if (section4Value === "ISS") {
-    onChange({ ...data, selected: [option] });
+        onChange({ ...data, selected: [code] });
 
-    const noModalOptions = [
-      "Vehicle is parked without moving for 10 or more consecutive days.",
-      "Unattached trailer e.g. 5th wheel, boat, utility trailer",
-    ];
+        const noModalCodes = ["ISS_VP10", "ISS_TRAILER"];
 
-    if (!noModalOptions.includes(option)) {
-      setShowISSModal(true); // ✅ only for other options
-    }
+        if (!noModalCodes.includes(code)) {
+          setShowISSModal(true);
+        }
 
-    return;
-  }
+        return;
+      }
 
       if (isSingleSelect) {
-        onChange({ ...data, selected: [option] });
+        onChange({ ...data, selected: [code] });
       } else {
-        const exists = data.selected.includes(option);
+        const exists = data.selected.includes(code);
         const updated = exists
-          ? data.selected.filter((item) => item !== option)
-          : [...data.selected, option];
+          ? data.selected.filter((item) => item !== code)
+          : [...data.selected, code];
 
-        if (section4Value === "LIV" && !updated.includes(livTriggerOption)) {
-          onChange({
-            ...data,
-            selected: updated,
-            day: "",
-            time: "",
-          });
+        if (section4Value === "LIV" && !updated.includes("LIV_SEEN_PERSON")) {
+          onChange({ ...data, selected: updated, day: "", time: "" });
         } else {
           onChange({ ...data, selected: updated });
         }
@@ -233,11 +287,11 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
 
         // ✅ ISS validation
         if (section4Value === "ISS") {
-    if (!data.day || !data.time) {
-      setShowISSModal(true);
-      isValid = false;
-    }
-  }
+          if (!data.day || !data.time) {
+            setShowISSModal(true);
+            isValid = false;
+          }
+        }
 
         // ✅ CRI validation (TEXT AREA)
         if (section4Value === "CRI") {
@@ -265,7 +319,7 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
         <div className="list-group mb-3">
           {options.length > 0 ? (
             options.map((option, index) => {
-              const isChecked = data.selected.includes(option);
+              const isChecked = data.selected.includes(option.code);
 
               return (
                 <div key={index}>
@@ -278,14 +332,14 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
                       type={isSingleSelect ? "radio" : "checkbox"}
                       name="case5Option"
                       checked={isChecked}
-                      onChange={() => handleSelect(option)}
+                      onChange={() => handleSelect(option.code)}
                     />
-                    <span>{option}</span>
+                    <span>{option.label}</span>
                   </label>
 
                   {/* LIV Inline UI (unchanged) */}
                   {section4Value === "LIV" &&
-                    option === livTriggerOption &&
+                    option.code === livTriggerOption &&
                     isChecked && (
                       <div className="mt-3 ms-4">
                         <h6 className="fw-bold">
