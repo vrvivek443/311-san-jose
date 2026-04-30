@@ -68,10 +68,13 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
         licensePlate: "",
       });
 
-      // ✅ Show modal on selection
+      setErrors((prev: any) => ({
+        ...prev,
+        licensePlate: "",
+      }));
+
       setShowModal(true);
 
-      // ✅ Reveal rest of form
       if (!showFullForm) {
         setShowFullForm(true);
       }
@@ -175,6 +178,11 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
                 licensePlate: value,
               });
 
+              setErrors((prev: any) => ({
+                ...prev,
+                licensePlate: "",
+              }));
+
               if (!showFullForm) {
                 setShowFullForm(true);
               }
@@ -240,9 +248,14 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
               <select
                 className="form-select"
                 value={vehicleType}
-                onChange={(e) =>
-                  onChange({ ...data, vehicleType: e.target.value })
-                }
+                onChange={(e) => {
+                  onChange({ ...data, vehicleType: e.target.value });
+
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    vehicleType: "",
+                  }));
+                }}
               >
                 <option value="">Select Vehicle Type</option>
                 <option value="car">Car</option>
@@ -260,9 +273,14 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
               <select
                 className="form-select"
                 value={vehicleColor}
-                onChange={(e) =>
-                  onChange({ ...data, vehicleColor: e.target.value })
-                }
+                onChange={(e) => {
+                  onChange({ ...data, vehicleColor: e.target.value });
+
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    vehicleColor: "",
+                  }));
+                }}
               >
                 <option value="">Select Color</option>
                 <option value="red">Red</option>
@@ -280,9 +298,14 @@ const SectionOne = forwardRef<SectionOneRef, SectionOneProps>(
               <select
                 className="form-select"
                 value={vehicleMake}
-                onChange={(e) =>
-                  onChange({ ...data, vehicleMake: e.target.value })
-                }
+                onChange={(e) => {
+                  onChange({ ...data, vehicleMake: e.target.value });
+
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    vehicleMake: "",
+                  }));
+                }}
               >
                 <option value="">Select Make</option>
                 <option value="toyota">Toyota</option>

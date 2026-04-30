@@ -13,10 +13,12 @@ import type { SectionTwoRef } from "./sections/section-two";
 import type { SectionThreeRef } from "./sections/section-three";
 import type { SectionFourRef, SectionFourCode } from "./sections/section-four";
 import type { SectionFiveRef } from "./sections/section-five";
+import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
 import "./vehicle-concerns.css";
 
 const VehicleConcern: React.FC = () => {
   const navigate = useNavigate();
+  const [showAlert, setShowAlert] = useState<null | "LIV" | "CRI">(null);
   const sectionOneRef = useRef<SectionOneRef>(null);
   const sectionTwoRef = useRef<SectionTwoRef>(null);
   const sectionThreeRef = useRef<SectionThreeRef>(null);
@@ -31,11 +33,11 @@ const VehicleConcern: React.FC = () => {
     vehicleModel: "",
   });
   const [sectionTwoData, setSectionTwoData] = useState({
-    image: null as File | null,
+    images: [] as File[],
     noPhoto: false,
   });
   const [sectionFiveData, setSectionFiveData] = useState({
-    selected: [], 
+    selected: [],
     notes: "",
   });
   const [sectionThreeData, setSectionThreeData] = useState({
@@ -56,6 +58,7 @@ const VehicleConcern: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleStepClick = (step: number) => {
+    if (currentStep === 6) return;
     if (step < currentStep) {
       setCurrentStep(step);
     }
@@ -100,7 +103,14 @@ const VehicleConcern: React.FC = () => {
       return;
     }
 
-    if (currentStep < 6) {
+    if (currentStep === 4) {
+      if (sectionFourData === "LIV" || sectionFourData === "CRI") {
+        setShowAlert(sectionFourData);
+        return;
+      } else {
+        setCurrentStep((prev) => prev + 1);
+      }
+    } else if (currentStep < 6) {
       setCurrentStep((prev) => prev + 1);
     } else {
       navigate("/");
@@ -108,6 +118,59 @@ const VehicleConcern: React.FC = () => {
   };
 
   const renderStepForm = () => {
+    if (showAlert === "LIV") {
+      return (
+        <div className="vehicle-container">
+          <AlertNavigation
+            description={[
+              "Thank you for taking the time to share your concern. At this time, the City of San José is unable to directly respond to individual reports of lived-in vehicles.",
+              "However, the information you are providing is valuable and will help the City better understand where lived-in vehicles are located.",
+              "This service request will be automatically closed.",
+              "For more information regarding the City’s current efforts please visit:",
+            ]}
+            links={[
+              { label: "Oversized/Lived-in Vehicles (OLIVE) Program" },
+              { label: "RV Pollution Prevention Program (RVP3)" },
+              { label: "Homelessness Response" },
+            ]}
+            primaryText="I understand, continue"
+            secondaryText="Go Back"
+            onPrimary={() => {
+              setShowAlert(null);
+              setCurrentStep(5);
+            }}
+            onSecondary={() => {
+              setShowAlert(null);
+            }}
+          />
+        </div>
+      );
+    }
+
+    if (showAlert === "CRI") {
+      return (
+        <div className="vehicle-container">
+          <AlertNavigation
+            description={[
+              "If you are witnessing criminal activity in progress or a vehicle is creating a hazard that is a risk to life or major property damage, call 911.",
+              "If you suspect that a vehicle may be involved in illegal activities e.g. drugs or prostitution, please continue to report here.",
+              "Currently we do not have an on-demand service for these reports.",
+              "However, the information you provide will be sent to the appropriate police units.",
+              "Once sent your request will be closed on SJ311.",
+            ]}
+            primaryText="I understand, continue"
+            secondaryText="Go Back"
+            onPrimary={() => {
+              setShowAlert(null);
+              setCurrentStep(5);
+            }}
+            onSecondary={() => {
+              setShowAlert(null);
+            }}
+          />
+        </div>
+      );
+    }
     switch (currentStep) {
       case 1:
         return (
@@ -168,7 +231,10 @@ const VehicleConcern: React.FC = () => {
             <div
               className={`step ${currentStep >= step ? "active" : ""}`}
               onClick={() => handleStepClick(step)} // Step click handler
-              style={{ cursor: "pointer" }} // Making the step clickable
+              style={{
+                cursor: currentStep === 6 ? "not-allowed" : "pointer",
+                opacity: currentStep === 6 ? 0.6 : 1,
+              }} // Making the step clickable
             >
               {step}
             </div>
@@ -180,10 +246,15 @@ const VehicleConcern: React.FC = () => {
       {/* Step Form */}
       {renderStepForm()}
 
-      {/* Next Button */}
-      <button className="next-btn" onClick={handleNext}>
-        {currentStep === 6 ? "Go Home" : currentStep === 5 ? "Submit" : "Next"}
-      </button>
+      {!showAlert && (
+        <button className="next-btn" onClick={handleNext}>
+          {currentStep === 6
+            ? "Go Home"
+            : currentStep === 5
+              ? "Submit"
+              : "Next"}
+        </button>
+      )}
 
       {isSubmitting && (
         <div className="loader-overlay">

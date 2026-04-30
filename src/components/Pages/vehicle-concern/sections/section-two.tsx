@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import Modal from "../../../shared/modal/modal";
 
 export interface SectionTwoRef {
@@ -7,7 +7,7 @@ export interface SectionTwoRef {
 
 interface SectionTwoProps {
   data: {
-    image: File | null;
+    images: File[];
     noPhoto: boolean;
   };
   onChange: (data: any) => void;
@@ -16,13 +16,27 @@ interface SectionTwoProps {
 const SectionTwo = forwardRef<SectionTwoRef, SectionTwoProps>(
   ({ data, onChange }, ref) => {
     const [error, setError] = useState("");
+    const [previews, setPreviews] = useState<string[]>([]);
 
-    const { image, noPhoto } = data;
+    const { images = [], noPhoto } = data;
     const [showModal, setShowModal] = useState(false);
+
+    // ✅ Generate previews
+    useEffect(() => {
+      if (!images || images.length === 0) {
+        setPreviews([]);
+        return;
+      }
+
+      const urls = images.map((file) => URL.createObjectURL(file));
+      setPreviews(urls);
+
+      return () => urls.forEach((url) => URL.revokeObjectURL(url));
+    }, [images]);
 
     useImperativeHandle(ref, () => ({
       validate() {
-        if (!image && !noPhoto) {
+        if ((!images || images.length === 0) && !noPhoto) {
           setError("Please upload a photo or select 'I don't have a photo'");
           return false;
         }
@@ -31,28 +45,52 @@ const SectionTwo = forwardRef<SectionTwoRef, SectionTwoProps>(
       },
     }));
 
+    const hasImages = images && images.length > 0;
+
+    const handleAddImages = (files: FileList | null) => {
+      if (!files) return;
+
+      const newFiles = Array.from(files);
+
+      onChange({
+        ...data,
+        images: [...images, ...newFiles],
+        noPhoto: false,
+      });
+
+      setError(""); 
+    };
+
+    const handleRemoveImage = (index: number) => {
+      const updated = images.filter((_, i) => i !== index);
+      onChange({
+        ...data,
+        images: updated,
+      });
+    };
+
     return (
       <>
         <Modal
           show={showModal}
           onClose={() => setShowModal(false)}
-          message="We prioritize investigating reports that include a photo of the vehicle.
+          message={`We prioritize investigating reports that include a photo of the vehicle.
 
-Including a photo with your report helps our officers locate the vehicle faster and easier thus helping expedite the investigation"
+Including a photo with your report helps our officers locate the vehicle faster and easier thus helping expedite the investigation`}
           primaryText="Upload Photo"
           secondaryText="I understand, continue"
           onPrimary={() => {
             onChange({
-              image: null,
+              images: [],
               noPhoto: false,
             });
-
             setShowModal(false);
           }}
           onSecondary={() => {
             setShowModal(false);
           }}
         />
+
         <div className="container mt-4">
           <label className="form-label fw-bold">
             Upload / take vehicle photo
@@ -62,26 +100,44 @@ Including a photo with your report helps our officers locate the vehicle faster 
             Photo should show the vehicle condition being reported
           </p>
 
-          <div className="d-flex justify-content-center border border-2 p-4 mb-2">
-            <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-              Add photo
-            </label>
+          {/* ✅ Image Grid Preview */}
+          {previews.length > 0 && (
+            <div className="row mb-3">
+              {previews.map((src, index) => (
+                <div className="col-4 mb-3 text-center" key={index}>
+                  <img
+                    src={src}
+                    alt="preview"
+                    style={{
+                      width: "100%",
+                      height: "120px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                    }}
+                  />
+                  <button
+                    className="btn btn-sm btn-danger mt-1"
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-            <input
-              id="file-upload"
-              type="file"
-              accept="image/*"
-              className="d-none"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  onChange({
-                    image: file,
-                    noPhoto: false,
-                  });
-                }
-              }}
-            />
+          {/* ✅ Upload Box */}
+          <div className="d-flex justify-content-center border border-2 p-4 mb-2">
+            <label style={{ cursor: "pointer" }}>
+              Add photo
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="d-none"
+                onChange={(e) => handleAddImages(e.target.files)}
+              />
+            </label>
           </div>
 
           <p className="text-muted small">Max 10 MB</p>
@@ -91,23 +147,26 @@ Including a photo with your report helps our officers locate the vehicle faster 
               type="radio"
               className="form-check-input"
               checked={noPhoto}
+              disabled={hasImages}
               onChange={() => {
                 onChange({
-                  image: null,
+                  images: [],
                   noPhoto: true,
                 });
-
+                setError(""); 
                 setShowModal(true);
               }}
             />
-            <label className="form-check-label">I don't have a photo</label>
+            <label className="form-check-label">
+              I don't have a photo
+            </label>
           </div>
 
           {error && <p className="text-danger">{error}</p>}
         </div>
       </>
     );
-  },
+  }
 );
 
 export default SectionTwo;

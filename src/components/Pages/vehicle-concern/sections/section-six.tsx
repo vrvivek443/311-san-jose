@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const SectionSix = () => {
+  const navigate = useNavigate();
   return (
     <div className="container mt-4 mb-4 text-center">
       <div className="p-4 border rounded bg-light">
@@ -47,7 +49,13 @@ const SectionSix = () => {
 
         {/* Buttons */}
         <div className="mt-4">
-          <button className="btn btn-info text-white w-100 mb-2">
+          <button
+            className="btn btn-info text-white w-100 mb-2"
+            onClick={() => {
+              navigate("/vehicle-concern");
+              window.location.reload();
+            }}
+          >
             Report another vehicle
           </button>
         </div>

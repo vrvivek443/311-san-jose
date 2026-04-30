@@ -1,7 +1,4 @@
-import React, {
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import React, { forwardRef, useImperativeHandle } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 export interface SectionThreeRef {
@@ -77,9 +74,13 @@ const SectionThree = forwardRef<SectionThreeRef, SectionThreeProps>(
                 name="cityStreet"
                 id="yes"
                 checked={data.cityStreet === "yes"}
-                onChange={() =>
-                  onChange({ ...data, cityStreet: "yes" })
-                }
+                onChange={() => {
+                  onChange({ ...data, cityStreet: "yes" });
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    cityStreet: "",
+                  }));
+                }}
               />
               <label className="form-check-label" htmlFor="yes">
                 Yes
@@ -93,9 +94,13 @@ const SectionThree = forwardRef<SectionThreeRef, SectionThreeProps>(
                 name="cityStreet"
                 id="no"
                 checked={data.cityStreet === "no"}
-                onChange={() =>
-                  onChange({ ...data, cityStreet: "no" })
-                }
+                onChange={() => {
+                  onChange({ ...data, cityStreet: "no" });
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    cityStreet: "",
+                  }));
+                }}
               />
               <label className="form-check-label" htmlFor="no">
                 No
@@ -122,8 +127,8 @@ const SectionThree = forwardRef<SectionThreeRef, SectionThreeProps>(
             <li>Type in the full address and click search</li>
             <li>or</li>
             <li>
-              Drag the red pin on the map below to select the location and
-              then click search
+              Drag the red pin on the map below to select the location and then
+              click search
             </li>
           </ul>
 
@@ -132,14 +137,16 @@ const SectionThree = forwardRef<SectionThreeRef, SectionThreeProps>(
             className="form-control mb-2"
             placeholder="Enter address"
             value={data.address}
-            onChange={(e) =>
-              onChange({ ...data, address: e.target.value })
-            }
+            onChange={(e) => {
+              onChange({ ...data, address: e.target.value });
+              setErrors((prev: any) => ({
+                ...prev,
+                address: "",
+              }));
+            }}
           />
 
-          {errors.address && (
-            <p className="text-danger">{errors.address}</p>
-          )}
+          {errors.address && <p className="text-danger">{errors.address}</p>}
 
           <button type="button" className="next-btn mb-3 search-btn">
             <span>Search (required)</span>
@@ -186,7 +193,7 @@ const SectionThree = forwardRef<SectionThreeRef, SectionThreeProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default SectionThree;

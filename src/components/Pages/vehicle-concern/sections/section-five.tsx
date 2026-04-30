@@ -1,4 +1,10 @@
-import React, { forwardRef, useImperativeHandle, useMemo } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
+import Modal from "../../../shared/modal/modal";
 
 export interface SectionFiveRef {
   validate: () => boolean;
@@ -13,15 +19,21 @@ interface SectionFiveProps {
     lastName?: string;
     email?: string;
     phone?: string;
+    day?: string;
+    time?: string;
   };
   onChange: (data: any) => void;
 }
 
 const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
   ({ section4Value, data, onChange }, ref) => {
-    const [error, setError] = React.useState("");
+    const [errorOption, setError] = React.useState("");
+    const [errorPara, setParaError] = React.useState("");
+    const [showISSModal, setShowISSModal] = useState(false);
 
-    // ✅ Determine selection type
+    const livTriggerOption =
+      "I have seen a person(s) living/ going in and out of the vehicle.";
+
     const isSingleSelect = section4Value === "POO" || section4Value === "ISS";
 
     const headerConfig = useMemo(() => {
@@ -79,7 +91,7 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
       switch (section4Value) {
         case "LIV":
           return [
-            "I have seen a person(s) living/ going in and out of the vehicle.",
+            livTriggerOption,
             "RV with trash around it - assumed that people are living in it.",
             "A car with a trailer attached with trash around it - assumed that people are living in them.",
           ];
@@ -151,29 +163,77 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
       }
     }, [section4Value]);
 
-    // ✅ Handle selection
     const handleSelect = (option: string) => {
+      setError("");
+      if (section4Value === "ISS") {
+        onChange({ ...data, selected: [option] });
+        setShowISSModal(true); // ✅ Open modal
+        return;
+      }
+
       if (isSingleSelect) {
-        onChange({ ...data, selected: [option] }); // radio behavior
+        onChange({ ...data, selected: [option] });
       } else {
         const exists = data.selected.includes(option);
         const updated = exists
           ? data.selected.filter((item) => item !== option)
           : [...data.selected, option];
 
-        onChange({ ...data, selected: updated });
+        if (section4Value === "LIV" && !updated.includes(livTriggerOption)) {
+          onChange({
+            ...data,
+            selected: updated,
+            day: "",
+            time: "",
+          });
+        } else {
+          onChange({ ...data, selected: updated });
+        }
       }
     };
 
-    // ✅ Validation
     useImperativeHandle(ref, () => ({
       validate() {
+        let isValid = true;
+
+        // Reset errors first
+        setError("");
+        setParaError("");
+
+        // ✅ Option validation
         if (!data.selected || data.selected.length === 0) {
           setError("Please select at least one option");
-          return false;
+          isValid = false;
         }
-        setError("");
-        return true;
+
+        // ✅ LIV validation
+        if (
+          section4Value === "LIV" &&
+          data.selected.includes(livTriggerOption)
+        ) {
+          if (!data.day || !data.time) {
+            setError("Please select day and time");
+            isValid = false;
+          }
+        }
+
+        // ✅ ISS validation
+        // if (section4Value === "ISS") {
+        //   if (!data.day || !data.time) {
+        //     setError("Please select day and time");
+        //     isValid = false;
+        //   }
+        // }
+
+        // ✅ CRI validation (TEXT AREA)
+        if (section4Value === "CRI") {
+          if (!data.notes || data.notes.trim() === "") {
+            setParaError("Please describe the activity observed");
+            isValid = false;
+          }
+        }
+
+        return isValid;
       },
     }));
 
@@ -190,54 +250,192 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
 
         <div className="list-group mb-3">
           {options.length > 0 ? (
-            options.map((option, index) => (
-              <label
-                key={index}
-                className="list-group-item list-group-item-action d-flex gap-2 align-items-start"
-                style={{ cursor: "pointer" }}
-              >
-                <input
-                  className="form-check-input mt-1"
-                  type={isSingleSelect ? "radio" : "checkbox"} // ✅ dynamic
-                  name="case5Option"
-                  checked={data.selected.includes(option)}
-                  onChange={() => handleSelect(option)}
-                />
-                <span>{option}</span>
-              </label>
-            ))
+            options.map((option, index) => {
+              const isChecked = data.selected.includes(option);
+
+              return (
+                <div key={index}>
+                  <label
+                    className="list-group-item list-group-item-action d-flex gap-2 align-items-start"
+                    style={{ cursor: "pointer" }}
+                  >
+                    <input
+                      className="form-check-input mt-1"
+                      type={isSingleSelect ? "radio" : "checkbox"}
+                      name="case5Option"
+                      checked={isChecked}
+                      onChange={() => handleSelect(option)}
+                    />
+                    <span>{option}</span>
+                  </label>
+
+                  {/* LIV Inline UI (unchanged) */}
+                  {section4Value === "LIV" &&
+                    option === livTriggerOption &&
+                    isChecked && (
+                      <div className="mt-3 ms-4">
+                        <h6 className="fw-bold">
+                          Is there a typical day and time the person(s) are seen
+                          at the vehicle?
+                          <span className="text-danger"> *</span>
+                        </h6>
+
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Day<span className="text-danger"> *</span>
+                          </label>
+                          <select
+                            className="form-select"
+                            value={data.day || ""}
+                            onChange={(e) => {
+                              onChange({ ...data, day: e.target.value });
+                              setError("");
+                            }}
+                          >
+                            <option value="">Select an option</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                          </select>
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Time<span className="text-danger"> *</span>
+                          </label>
+                          <select
+                            className="form-select"
+                            value={data.time || ""}
+                            onChange={(e) => {
+                              onChange({ ...data, time: e.target.value });
+                              setError("");
+                            }}
+                          >
+                            <option value="">Select an option</option>
+                            <option value="Morning">
+                              Morning (6:00am-12:00noon)
+                            </option>
+                            <option value="Afternoon">
+                              Afternoon (Noon-6:00pm)
+                            </option>
+                            <option value="Evening">
+                              Evening (6:00pm-10:00pm)
+                            </option>
+                            <option value="Overnight">
+                              Overnight (10:00pm-6:00am)
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                </div>
+              );
+            })
           ) : (
             <p className="text-muted">No options available</p>
           )}
         </div>
 
-        {error && <p className="text-danger">{error}</p>}
+        {errorOption && <p className="text-danger">{errorOption}</p>}
 
         <div className="mb-3">
           <label className="fw-semibold mb-2">
-            Additional Information - If any
+            {section4Value === "CRI"
+              ? "Describe the activity observed:"
+              : "Additional Information - If any"}
+            {section4Value === "CRI" && <span className="text-danger"> *</span>}
           </label>
           <textarea
             className="form-control"
             rows={3}
             placeholder="Type in Text"
             value={data.notes}
-            onChange={(e) => onChange({ ...data, notes: e.target.value })}
+            onChange={(e) => {
+              onChange({ ...data, notes: e.target.value });
+              setParaError("");
+            }}
           />
         </div>
 
+        {errorPara && <p className="text-danger">{errorPara}</p>}
+
+        {/* ✅ ISS Modal */}
+        <Modal
+          show={showISSModal}
+          onClose={() => setShowISSModal(false)}
+          size="sm"
+        >
+          <div className="text-start">
+            <h6 className="fw-bold">
+              Is there a typical day and time you are seeing the illegal
+              parking?
+              <span className="text-danger"> *</span>
+            </h6>
+
+            <div className="mt-3">
+              <label className="fw-semibold">Day</label>
+              {["Weekday", "Weekend", "Everyday"].map((d) => (
+                <div className="form-check" key={d}>
+                  <input
+                    type="radio"
+                    className="form-check-input"
+                    name="day"
+                    checked={data.day === d}
+                    onChange={() => {
+                      onChange({ ...data, day: d });
+                      setError("");
+                    }}
+                  />
+                  <label className="form-check-label">{d}</label>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-3">
+              <label className="fw-semibold">Time of Day</label>
+              {[
+                "Morning (6:00am-12:00noon)",
+                "Afternoon (Noon-6:00pm)",
+                "Evening (6:00pm-10:00pm)",
+                "Overnight (10:00pm-6:00am)",
+              ].map((t) => (
+                <div className="form-check" key={t}>
+                  <input
+                    type="radio"
+                    className="form-check-input"
+                    name="time"
+                    checked={data.time === t}
+                    onChange={() => {
+                      onChange({ ...data, time: t });
+                      setError("");
+                    }}
+                  />
+                  <label className="form-check-label">{t}</label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Modal>
+
         {section4Value === "CRI" && (
           <div className="mt-4">
+            {" "}
             <h6 className="fw-bold">
-              Please provide your contact information below:
-            </h6>
+              {" "}
+              Please provide your contact information below:{" "}
+            </h6>{" "}
             <p className="text-muted">
+              {" "}
               It will be helpful if investigators have a way to contact you to
-              follow-up with any additional questions.
-            </p>
-
+              follow-up with any additional questions.{" "}
+            </p>{" "}
             <div className="mb-3">
-              <label className="form-label">Your first name:</label>
+              {" "}
+              <label className="form-label">Your first name:</label>{" "}
               <input
                 type="text"
                 className="form-control"
@@ -245,11 +443,11 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
                 onChange={(e) =>
                   onChange({ ...data, firstName: e.target.value })
                 }
-              />
-            </div>
-
+              />{" "}
+            </div>{" "}
             <div className="mb-3">
-              <label className="form-label">Your last name:</label>
+              {" "}
+              <label className="form-label">Your last name:</label>{" "}
               <input
                 type="text"
                 className="form-control"
@@ -257,21 +455,21 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
                 onChange={(e) =>
                   onChange({ ...data, lastName: e.target.value })
                 }
-              />
-            </div>
-
+              />{" "}
+            </div>{" "}
             <div className="mb-3">
-              <label className="form-label">Email address:</label>
+              {" "}
+              <label className="form-label">Email address:</label>{" "}
               <input
                 type="email"
                 className="form-control"
                 value={data.email || ""}
                 onChange={(e) => onChange({ ...data, email: e.target.value })}
-              />
-            </div>
-
+              />{" "}
+            </div>{" "}
             <div className="mb-3">
-              <label className="form-label">Phone number:</label>
+              {" "}
+              <label className="form-label">Phone number:</label>{" "}
               <input
                 type="text"
                 className="form-control"
