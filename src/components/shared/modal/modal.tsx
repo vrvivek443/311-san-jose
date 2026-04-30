@@ -1,5 +1,5 @@
 import React from "react";
-import "./modal.css"
+import "./modal.css";
 
 interface ModalProps {
   show: boolean;
@@ -23,47 +23,42 @@ const Modal: React.FC<ModalProps> = ({
   if (!show) return null;
 
   return (
-  <div className="modal-backdrop-custom">
-    <div className="modal fade show d-block modal-custom" tabIndex={-1}>
-      <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content">
+    <div className="modal-backdrop-custom">
+      <div className="modal fade show d-block modal-custom" tabIndex={-1}>
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            {/* Header */}
+            <div className="modal-header border-0">
+              <button
+                type="button"
+                className="btn-close"
+                onClick={onClose}
+              ></button>
+            </div>
 
-          {/* Header */}
-          <div className="modal-header border-0">
-            <button
-              type="button"
-              className="btn-close"
-              onClick={onClose}
-            ></button>
+            {/* Body */}
+            <div className="modal-body text-center">
+              <p>{message}</p>
+            </div>
+
+            {/* Footer */}
+            <div className="modal-footer flex-column border-0">
+              <button className="btn w-100 btn-color" onClick={onPrimary}>
+                {primaryText}
+              </button>
+
+              <button
+                className="btn btn-outline-secondary w-100"
+                onClick={onSecondary}
+              >
+                {secondaryText}
+              </button>
+            </div>
           </div>
-
-          {/* Body */}
-          <div className="modal-body text-center">
-            <p>{message}</p>
-          </div>
-
-          {/* Footer */}
-          <div className="modal-footer flex-column border-0">
-            <button
-              className="btn w-100 btn-color"
-              onClick={onPrimary}
-            >
-              {primaryText}
-            </button>
-
-            <button
-              className="btn btn-outline-secondary w-100"
-              onClick={onSecondary}
-            >
-              {secondaryText}
-            </button>
-          </div>
-
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default Modal;
