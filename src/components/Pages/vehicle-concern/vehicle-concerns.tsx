@@ -35,7 +35,7 @@ const VehicleConcern: React.FC = () => {
     noPhoto: false,
   });
   const [sectionFiveData, setSectionFiveData] = useState({
-    selected: "",
+    selected: [], 
     notes: "",
   });
   const [sectionThreeData, setSectionThreeData] = useState({

@@ -1,8 +1,4 @@
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useMemo,
-} from "react";
+import React, { forwardRef, useImperativeHandle, useMemo } from "react";
 
 export interface SectionFiveRef {
   validate: () => boolean;
@@ -11,8 +7,12 @@ export interface SectionFiveRef {
 interface SectionFiveProps {
   section4Value: string;
   data: {
-    selected: string;
+    selected: string[];
     notes: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
   };
   onChange: (data: any) => void;
 }
@@ -20,6 +20,9 @@ interface SectionFiveProps {
 const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
   ({ section4Value, data, onChange }, ref) => {
     const [error, setError] = React.useState("");
+
+    // ✅ Determine selection type
+    const isSingleSelect = section4Value === "POO" || section4Value === "ISS";
 
     const headerConfig = useMemo(() => {
       switch (section4Value) {
@@ -148,9 +151,24 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
       }
     }, [section4Value]);
 
+    // ✅ Handle selection
+    const handleSelect = (option: string) => {
+      if (isSingleSelect) {
+        onChange({ ...data, selected: [option] }); // radio behavior
+      } else {
+        const exists = data.selected.includes(option);
+        const updated = exists
+          ? data.selected.filter((item) => item !== option)
+          : [...data.selected, option];
+
+        onChange({ ...data, selected: updated });
+      }
+    };
+
+    // ✅ Validation
     useImperativeHandle(ref, () => ({
       validate() {
-        if (!data.selected) {
+        if (!data.selected || data.selected.length === 0) {
           setError("Please select at least one option");
           return false;
         }
@@ -180,13 +198,10 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
               >
                 <input
                   className="form-check-input mt-1"
-                  type="radio"
+                  type={isSingleSelect ? "radio" : "checkbox"} // ✅ dynamic
                   name="case5Option"
-                  value={option}
-                  checked={data.selected === option}
-                  onChange={() =>
-                    onChange({ ...data, selected: option })
-                  }
+                  checked={data.selected.includes(option)}
+                  onChange={() => handleSelect(option)}
                 />
                 <span>{option}</span>
               </label>
@@ -207,11 +222,66 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
             rows={3}
             placeholder="Type in Text"
             value={data.notes}
-            onChange={(e) =>
-              onChange({ ...data, notes: e.target.value })
-            }
+            onChange={(e) => onChange({ ...data, notes: e.target.value })}
           />
         </div>
+
+        {section4Value === "CRI" && (
+          <div className="mt-4">
+            <h6 className="fw-bold">
+              Please provide your contact information below:
+            </h6>
+            <p className="text-muted">
+              It will be helpful if investigators have a way to contact you to
+              follow-up with any additional questions.
+            </p>
+
+            <div className="mb-3">
+              <label className="form-label">Your first name:</label>
+              <input
+                type="text"
+                className="form-control"
+                value={data.firstName || ""}
+                onChange={(e) =>
+                  onChange({ ...data, firstName: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Your last name:</label>
+              <input
+                type="text"
+                className="form-control"
+                value={data.lastName || ""}
+                onChange={(e) =>
+                  onChange({ ...data, lastName: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Email address:</label>
+              <input
+                type="email"
+                className="form-control"
+                value={data.email || ""}
+                onChange={(e) => onChange({ ...data, email: e.target.value })}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Phone number:</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="xxx-xxx-xxxx"
+                value={data.phone || ""}
+                onChange={(e) => onChange({ ...data, phone: e.target.value })}
+              />
+            </div>
+          </div>
+        )}
       </div>
     );
   },
