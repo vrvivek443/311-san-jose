@@ -1,4 +1,9 @@
-import React, { forwardRef, useImperativeHandle, useState, useEffect } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useEffect,
+} from "react";
 import Modal from "../../../shared/modal/modal";
 
 export interface SectionTwoRef {
@@ -50,15 +55,31 @@ const SectionTwo = forwardRef<SectionTwoRef, SectionTwoProps>(
     const handleAddImages = (files: FileList | null) => {
       if (!files) return;
 
-      const newFiles = Array.from(files);
+      const maxSize = 10 * 1024 * 1024; // 10MB
 
-      onChange({
-        ...data,
-        images: [...images, ...newFiles],
-        noPhoto: false,
+      const validFiles: File[] = [];
+      let hasError = false;
+
+      Array.from(files).forEach((file) => {
+        if (file.size > maxSize) {
+          hasError = true;
+        } else {
+          validFiles.push(file);
+        }
       });
 
-      setError(""); 
+      if (hasError) {
+        setError("Each file must be less than 10 MB");
+      }
+
+      if (validFiles.length > 0) {
+        onChange({
+          ...data,
+          images: [...images, ...validFiles],
+          noPhoto: false,
+        });
+        setError("");
+      }
     };
 
     const handleRemoveImage = (index: number) => {
@@ -153,20 +174,18 @@ Including a photo with your report helps our officers locate the vehicle faster 
                   images: [],
                   noPhoto: true,
                 });
-                setError(""); 
+                setError("");
                 setShowModal(true);
               }}
             />
-            <label className="form-check-label">
-              I don't have a photo
-            </label>
+            <label className="form-check-label">I don't have a photo</label>
           </div>
 
           {error && <p className="text-danger">{error}</p>}
         </div>
       </>
     );
-  }
+  },
 );
 
 export default SectionTwo;
