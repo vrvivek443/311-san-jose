@@ -3,3 +3,19 @@
     margin-bottom: 20px;
     font-weight: 600;
 }
+
+.new-button {
+    position: "absolute";
+    top: "-6px";
+    right: "-6px";
+    background: "red";
+    color: "white";
+    border: "none";
+    border-radius: "50%";
+    width: "20px";
+    height: "20px";
+    font-size: "12px";
+    cursor: "pointer";
+    line-height: "18px";
+    text-align: "center";
+}

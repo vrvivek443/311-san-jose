@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 const Graffiti = () => {
   const navigate = useNavigate();
+  const [images, setImages] = useState<File[]>([]);
+  const [imageError, setImageError] = useState("");
 
   const [data, setData] = useState({
     address: "",
@@ -11,6 +13,7 @@ const Graffiti = () => {
     graffitiOn: "",
     isPublic: "",
     isOffensive: "",
+    whereIsIt: "",
     position: { lat: 37.3382, lng: -121.8863 }, // San Jose default
   });
 
@@ -28,13 +31,42 @@ const Graffiti = () => {
     setData({ ...data, position: { lat, lng } });
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    let selectedFiles = Array.from(files);
+
+    let hasError = false;
+
+    const validFiles = selectedFiles.filter((file) => {
+      if (file.size > 10 * 1024 * 1024) {
+        hasError = true;
+        return false;
+      }
+      return true;
+    });
+
+    if (hasError) {
+      setImageError("One or more images exceed 10MB limit");
+    } else {
+      setImageError("");
+    }
+
+    // ✅ only add valid files
+    if (validFiles.length > 0) {
+      setImages((prev) => [...prev, ...validFiles]);
+    }
+  };
+
   const validate = () => {
     let newErrors: any = {};
 
     if (!data.address) newErrors.address = "Address is required";
     if (!data.graffitiOn) newErrors.graffitiOn = "Please select an option";
-    if (!data.additionalInfo) newErrors.additionalInfo = "This field is required";
-    if (!data.isOffensive) newErrors.isOffensive = "Please select an option";
+    if (!data.additionalInfo)
+      newErrors.additionalInfo = "This field is required";
+    if (!data.whereIsIt) newErrors.whereIsIt = "Please select an option";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -55,6 +87,71 @@ const Graffiti = () => {
       <p className="text-muted">
         Report graffiti on buildings, sidewalks, roads and structures.
       </p>
+
+      {/* Photo Upload Section */}
+      <div className="mb-3">
+        <label className="fw-bold">Add a Photo</label>
+        <p className="text-muted" style={{ fontSize: "13px" }}>
+          Help us find it faster. Select any type of image format (Max 10MB
+          each)
+        </p>
+
+        <div
+          className="border rounded d-flex flex-column align-items-center justify-content-center p-4"
+          style={{ cursor: "pointer", background: "#f8f9fa" }}
+          onClick={() => document.getElementById("fileInput")?.click()}
+        >
+          <div style={{ fontSize: "24px" }}>📷</div>
+          <p className="mb-0">Drag file here or</p>
+          <span className="text-primary">choose from folder</span>
+        </div>
+
+        <input
+          id="fileInput"
+          type="file"
+          multiple
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={handleImageUpload}
+        />
+
+        {/* Preview */}
+        {images.length > 0 && (
+          <div className="mt-3 d-flex flex-wrap gap-2">
+            {images.map((img, index) => (
+              <div
+                key={index}
+                style={{
+                  position: "relative",
+                  width: "80px",
+                  height: "80px",
+                }}
+              >
+                <img
+                  src={URL.createObjectURL(img)}
+                  alt="preview"
+                  width={80}
+                  height={80}
+                  style={{
+                    objectFit: "cover",
+                    borderRadius: "6px",
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setImages((prev) => prev.filter((_, i) => i !== index))
+                  }
+                  className="new-button"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Address Section */}
       <div className="mb-3">
@@ -77,9 +174,7 @@ const Graffiti = () => {
           }}
         />
 
-        {errors.address && (
-          <p className="text-danger">{errors.address}</p>
-        )}
+        {errors.address && <p className="text-danger">{errors.address}</p>}
 
         <button className="next-btn mb-3 search-btn">
           Search (Optional) 🔍
@@ -143,9 +238,7 @@ const Graffiti = () => {
               className="form-check-input"
               name="public"
               checked={data.isPublic === "yes"}
-              onChange={() =>
-                setData({ ...data, isPublic: "yes" })
-              }
+              onChange={() => setData({ ...data, isPublic: "yes" })}
             />
             <label className="form-check-label">Yes</label>
           </div>
@@ -156,9 +249,7 @@ const Graffiti = () => {
               className="form-check-input"
               name="public"
               checked={data.isPublic === "no"}
-              onChange={() =>
-                setData({ ...data, isPublic: "no" })
-              }
+              onChange={() => setData({ ...data, isPublic: "no" })}
             />
             <label className="form-check-label">No</label>
           </div>
@@ -176,9 +267,7 @@ const Graffiti = () => {
               className="form-check-input"
               name="offensive"
               checked={data.isOffensive === "yes"}
-              onChange={() =>
-                setData({ ...data, isOffensive: "yes" })
-              }
+              onChange={() => setData({ ...data, isOffensive: "yes" })}
             />
             <label className="form-check-label">Yes</label>
           </div>
@@ -189,9 +278,7 @@ const Graffiti = () => {
               className="form-check-input"
               name="offensive"
               checked={data.isOffensive === "no"}
-              onChange={() =>
-                setData({ ...data, isOffensive: "no" })
-              }
+              onChange={() => setData({ ...data, isOffensive: "no" })}
             />
             <label className="form-check-label">No</label>
           </div>
@@ -200,7 +287,9 @@ const Graffiti = () => {
 
       {/* Additional Info */}
       <div className="mb-3">
-        <label className="fw-semibold">Tell us more<span className="text-danger">*</span></label>
+        <label className="fw-semibold">
+          Tell us more<span className="text-danger">*</span>
+        </label>
         <textarea
           className="form-control"
           rows={3}
@@ -232,11 +321,9 @@ const Graffiti = () => {
             <input
               type="radio"
               className="form-check-input"
-              name="offensive"
-              checked={data.isOffensive === "yes"}
-              onChange={() =>
-                setData({ ...data, isOffensive: "yes" })
-              }
+              name="whereIsIt"
+              checked={data.whereIsIt === "yes"}
+              onChange={() => setData({ ...data, whereIsIt: "yes" })}
             />
             <label className="form-check-label">Yes</label>
           </div>
@@ -246,17 +333,13 @@ const Graffiti = () => {
               type="radio"
               className="form-check-input"
               name="offensive"
-              checked={data.isOffensive === "no"}
-              onChange={() =>
-                setData({ ...data, isOffensive: "no" })
-              }
+              checked={data.whereIsIt === "no"}
+              onChange={() => setData({ ...data, whereIsIt: "no" })}
             />
             <label className="form-check-label">No</label>
           </div>
         </div>
-        {errors.isOffensive && (
-          <p className="text-danger">{errors.isOffensive}</p>
-        )}
+        {errors.whereIsIt && <p className="text-danger">{errors.whereIsIt}</p>}
       </div>
 
       {/* Submit */}
