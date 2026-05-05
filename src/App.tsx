@@ -5,6 +5,7 @@ import "./App.css";
 import Home from "./components/Home";
 import OtherReports from "./components/other-reports";
 import VehicleConcerns from "./components/Pages/vehicle-concern/vehicle-concerns";
+import Graffiti from "./components/Pages/graffiti/graffiti";
 
 function App() {
   const navigate = useNavigate();
@@ -130,6 +131,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/other-reports" element={<OtherReports />} />
             <Route path="/vehicle-concern" element={<VehicleConcerns />} />
+            <Route path="/graffiti" element={<Graffiti />} />
           </Routes>
 
         </div>

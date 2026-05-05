@@ -87,7 +87,7 @@
 /* Page title */
 .section-title {
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 /* Grid layout like dashboard */
@@ -117,8 +117,8 @@
 }
 
 .tile-icon img {
-  width: 35px;
-  height: 35px;
+  width: 30px;
+  height: 30px;
 }
 
 .tile-label {
