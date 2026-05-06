@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
+import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
+import "./graffiti.css";
 
 const Graffiti = () => {
   const navigate = useNavigate();
   const [images, setImages] = useState<File[]>([]);
   const [imageError, setImageError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [data, setData] = useState({
     address: "",
@@ -18,6 +21,7 @@ const Graffiti = () => {
   });
 
   const [errors, setErrors] = useState<any>({});
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const containerStyle = {
     width: "100%",
@@ -64,8 +68,9 @@ const Graffiti = () => {
 
     if (!data.address) newErrors.address = "Address is required";
     if (!data.graffitiOn) newErrors.graffitiOn = "Please select an option";
-    if (!data.additionalInfo)
-      newErrors.additionalInfo = "This field is required";
+    if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
+      newErrors.additionalInfo = "Additional Information is required";
+    }
     if (!data.whereIsIt) newErrors.whereIsIt = "Please select an option";
 
     setErrors(newErrors);
@@ -75,11 +80,33 @@ const Graffiti = () => {
   const handleSubmit = () => {
     if (!validate()) return;
 
-    console.log("Graffiti Data:", data);
-    alert("Submitted!");
-    navigate("/");
+    setIsSubmitting(true);
+
+    setTimeout(() => {
+      console.log("Graffiti Data:", data);
+
+      setIsSubmitting(false);
+      setShowSuccess(true);
+    }, 1000);
   };
 
+  if (showSuccess) {
+    return (
+    <>
+      <h4 className="fw-bold mb-4">Your Graffiti Report</h4>
+      <AlertNavigation
+        description={[
+          "Write down your reference ID: 260504-001201. Use it to track the status of your report.",
+          "Graffiti is abated within 72 hours being reported. However, due to location, weather or surface, abatement times may vary. Gang and Offensive graffiti is removed within 1 business day. In order to have gang/offensive graffiti elevated, residents should call the graffiti program directly at (408) 975-7233.",
+        ]}
+        primaryText="Track my report"
+        secondaryText="Return home"
+        onPrimary={() => navigate("/track-report")}
+        onSecondary={() => navigate("/")}
+      />
+    </>
+    );
+  }
   return (
     <div className="container mt-3 mb-4">
       {/* Header */}
@@ -296,15 +323,37 @@ const Graffiti = () => {
           placeholder="Add details here"
           value={data.additionalInfo}
           onChange={(e) => {
-            setData({ ...data, additionalInfo: e.target.value });
-            setErrors((prev: any) => ({
-              ...prev,
-              additionalInfo: "",
-            }));
+            let value = e.target.value;
+
+            // ✅ HARD LIMIT: stop at 4000 chars
+            if (value.length > 4000) return;
+
+            setData({ ...data, additionalInfo: value });
+
+            if (value.trim().length === 0) {
+              setErrors((prev: any) => ({
+                ...prev,
+                additionalInfo: "This field is required",
+              }));
+            } else {
+              setErrors((prev: any) => ({
+                ...prev,
+                additionalInfo: "",
+              }));
+            }
           }}
         />
+        <p
+          className={`mt-1 ${
+            data.additionalInfo.length === 4000 ? "text-danger" : "text-muted"
+          }`}
+          style={{ fontSize: "12px" }}
+        >
+          {data.additionalInfo.length}/4000 characters
+        </p>
+
         {errors.additionalInfo && (
-          <p className="text-danger">{errors.additionalInfo}</p>
+          <p className="text-danger mb-1">{errors.additionalInfo}</p>
         )}
       </div>
 
@@ -346,6 +395,15 @@ const Graffiti = () => {
       <button className="next-btn w-100" onClick={handleSubmit}>
         Submit
       </button>
+
+      {isSubmitting && (
+        <div className="loader-overlay">
+          <div className="loader-box">
+            <div className="spinner"></div>
+            <p>Submitting your report...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

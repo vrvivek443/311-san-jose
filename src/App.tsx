@@ -6,6 +6,8 @@ import Home from "./components/Home";
 import OtherReports from "./components/other-reports";
 import VehicleConcerns from "./components/Pages/vehicle-concern/vehicle-concerns";
 import Graffiti from "./components/Pages/graffiti/graffiti";
+import TrackReport from "./components/Pages/graffiti/Track-Report/track-report";
+import IllegalDumping from "./components/Pages/illegal-dumping/illegal-dumping";
 
 function App() {
   const navigate = useNavigate();
@@ -110,7 +112,7 @@ function App() {
 
         {/* Footer Buttons */}
         <div className="sidebar-footer">
-          <button className="btn login-btn">
+          <button className="btn login-btn btn-cover">
             <i className="bx bx-log-in"></i>
             <span className="btn-text">Login</span>
           </button>
@@ -132,6 +134,8 @@ function App() {
             <Route path="/other-reports" element={<OtherReports />} />
             <Route path="/vehicle-concern" element={<VehicleConcerns />} />
             <Route path="/graffiti" element={<Graffiti />} />
+            <Route path="/track-report" element={<TrackReport />}/>
+            <Route path="/illegal-dumping" element={<IllegalDumping />} />
           </Routes>
 
         </div>

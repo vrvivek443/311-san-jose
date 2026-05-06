@@ -59,12 +59,12 @@
 
 /* Colors */
 .login-btn {
-  background: #0d6efd;
+  background: #0f766e;
   color: white;
 }
 
 .signup-btn {
-  background: #198754;
+  background: #0f766e;
   color: white;
 }
 
@@ -180,4 +180,5 @@
 .show-all-btn:hover {
   background-color: #0056b3;
 }
+
 
