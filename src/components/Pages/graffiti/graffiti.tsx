@@ -41,26 +41,39 @@ const Graffiti = () => {
 
     let selectedFiles = Array.from(files);
 
-    let hasError = false;
+    let hasSizeError = false;
+    let hasTypeError = false;
 
     const validFiles = selectedFiles.filter((file) => {
-      if (file.size > 10 * 1024 * 1024) {
-        hasError = true;
+      if (!file.type.startsWith("image/")) {
+        hasTypeError = true;
         return false;
       }
+
+      // ✅ Check file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        hasSizeError = true;
+        return false;
+      }
+
       return true;
     });
 
-    if (hasError) {
+    if (hasTypeError) {
+      setImageError("Only image files are allowed (JPG, PNG, etc.)");
+    } else if (hasSizeError) {
       setImageError("One or more images exceed 10MB limit");
     } else {
       setImageError("");
     }
 
-    // ✅ only add valid files
+    
     if (validFiles.length > 0) {
       setImages((prev) => [...prev, ...validFiles]);
     }
+
+    // 🔥 Reset input so same file can be reselected
+    e.target.value = "";
   };
 
   const validate = () => {
@@ -92,19 +105,19 @@ const Graffiti = () => {
 
   if (showSuccess) {
     return (
-    <>
-      <h4 className="fw-bold mb-4">Your Graffiti Report</h4>
-      <AlertNavigation
-        description={[
-          "Write down your reference ID: 260504-001201. Use it to track the status of your report.",
-          "Graffiti is abated within 72 hours being reported. However, due to location, weather or surface, abatement times may vary. Gang and Offensive graffiti is removed within 1 business day. In order to have gang/offensive graffiti elevated, residents should call the graffiti program directly at (408) 975-7233.",
-        ]}
-        primaryText="Track my report"
-        secondaryText="Return home"
-        onPrimary={() => navigate("/track-report")}
-        onSecondary={() => navigate("/")}
-      />
-    </>
+      <>
+        <h4 className="fw-bold mb-4">Your Graffiti Report</h4>
+        <AlertNavigation
+          description={[
+            "Write down your reference ID: 260504-001201. Use it to track the status of your report.",
+            "Graffiti is abated within 72 hours being reported. However, due to location, weather or surface, abatement times may vary. Gang and Offensive graffiti is removed within 1 business day. In order to have gang/offensive graffiti elevated, residents should call the graffiti program directly at (408) 975-7233.",
+          ]}
+          primaryText="Track my report"
+          secondaryText="Return home"
+          onPrimary={() => navigate("/track-report")}
+          onSecondary={() => navigate("/")}
+        />
+      </>
     );
   }
   return (
@@ -132,6 +145,7 @@ const Graffiti = () => {
           <p className="mb-0">Drag file here or</p>
           <span className="text-primary">choose from folder</span>
         </div>
+        {errors.address && <p className="text-danger">{errors.address}</p>}
 
         <input
           id="fileInput"
@@ -180,6 +194,8 @@ const Graffiti = () => {
         )}
       </div>
 
+      {imageError && <p className="text-danger">{imageError}</p>}
+
       {/* Address Section */}
       <div className="mb-3">
         <label className="fw-bold">
@@ -200,8 +216,6 @@ const Graffiti = () => {
             setErrors((prev: any) => ({ ...prev, address: "" }));
           }}
         />
-
-        {errors.address && <p className="text-danger">{errors.address}</p>}
 
         <button className="next-btn mb-3 search-btn">
           Search (Optional) 🔍
@@ -359,10 +373,11 @@ const Graffiti = () => {
 
       <div className="mb-3">
         <label className="fw-bold">
-          Where is it? <span className="text-danger">*</span>
+          Allow public to view your report?
+          <span className="text-danger">*</span>
         </label>
         <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
-          (Only valid city locations are accepted)
+          No one will see your name
         </p>
 
         <div className="mt-2">
@@ -372,7 +387,13 @@ const Graffiti = () => {
               className="form-check-input"
               name="whereIsIt"
               checked={data.whereIsIt === "yes"}
-              onChange={() => setData({ ...data, whereIsIt: "yes" })}
+              onChange={() => {
+                setData({ ...data, whereIsIt: "yes" });
+                setErrors((prev: any) => ({
+                  ...prev,
+                  whereIsIt: "",
+                }));
+              }}
             />
             <label className="form-check-label">Yes</label>
           </div>
@@ -383,7 +404,13 @@ const Graffiti = () => {
               className="form-check-input"
               name="offensive"
               checked={data.whereIsIt === "no"}
-              onChange={() => setData({ ...data, whereIsIt: "no" })}
+              onChange={() => {
+                setData({ ...data, whereIsIt: "no" });
+                setErrors((prev: any) => ({
+                  ...prev,
+                  whereIsIt: "",
+                }));
+              }}
             />
             <label className="form-check-label">No</label>
           </div>
