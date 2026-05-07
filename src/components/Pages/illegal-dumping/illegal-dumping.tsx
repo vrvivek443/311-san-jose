@@ -78,10 +78,15 @@ const IllegalDumping = () => {
     let newErrors: any = {};
 
     if (!data.address) newErrors.address = "Please provide a location and remember to hit Search";
-    if (!data.graffitiOn) newErrors.graffitiOn = "Please select an option";
+    if (!data.whereIsIt) newErrors.whereIsIt = "Please select an option";
     if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
       newErrors.additionalInfo = "Please describe the issue";
     }
+    if (images.length === 0) {
+    setImageError("Please upload at least one image");
+  } else {
+    setImageError("");
+  }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -100,22 +105,26 @@ const IllegalDumping = () => {
   };
 
   if (showSuccess) {
-    return (
+  return (
     <>
-      <h4 className="fw-bold mb-4">Your Graffiti Report</h4>
+      <h4 className="fw-bold mb-4">
+        Thank you for your report, Vivek Vr!
+      </h4>
+
       <AlertNavigation
         description={[
-          "Write down your reference ID: 260504-001201. Use it to track the status of your report.",
-          "Graffiti is abated within 72 hours being reported. However, due to location, weather or surface, abatement times may vary. Gang and Offensive graffiti is removed within 1 business day. In order to have gang/offensive graffiti elevated, residents should call the graffiti program directly at (408) 975-7233.",
+          "Your reference ID# is 260507-000018.",
+          "We'll also email you a confirmation.",
+          "The RAPID (Removing and Preventing Illegal Dumping) team will respond to reports of illegal dumping within 5 business days.",
         ]}
         primaryText="Track my report"
-        secondaryText="Return home"
         onPrimary={() => navigate("/track-report")}
-        onSecondary={() => navigate("/")}
+        secondaryText="Return home"
+onSecondary={() => navigate("/")}
       />
     </>
-    );
-  }
+  );
+}
   return (
     <div className="container mt-3 mb-4">
       {/* Header */}
@@ -126,7 +135,7 @@ const IllegalDumping = () => {
 
       {/* Photo Upload Section */}
       <div className="mb-3">
-        <label className="fw-bold">Add a Photo</label>
+        <label className="fw-bold">Add a Photo<span className="text-danger">*</span></label>
         <p className="text-muted" style={{ fontSize: "13px" }}>
           Help us find it faster. Select any type of image format (Max 10MB
           each)
@@ -150,6 +159,10 @@ const IllegalDumping = () => {
           style={{ display: "none" }}
           onChange={handleImageUpload}
         />
+
+        {imageError && (
+  <p className="text-danger mt-2">{imageError}</p>
+)}
 
         {/* Preview */}
         {images.length > 0 && (

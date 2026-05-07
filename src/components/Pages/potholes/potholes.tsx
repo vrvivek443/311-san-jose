@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
-import "./graffiti.css";
+import "./potholes.css";
 
-const Graffiti = () => {
+const Potholes = () => {
   const navigate = useNavigate();
   const [images, setImages] = useState<File[]>([]);
   const [imageError, setImageError] = useState("");
@@ -50,7 +50,6 @@ const Graffiti = () => {
         return false;
       }
 
-      // ✅ Check file size (10MB)
       if (file.size > 10 * 1024 * 1024) {
         hasSizeError = true;
         return false;
@@ -67,25 +66,23 @@ const Graffiti = () => {
       setImageError("");
     }
 
-    
     if (validFiles.length > 0) {
       setImages((prev) => [...prev, ...validFiles]);
     }
 
-    // 🔥 Reset input so same file can be reselected
     e.target.value = "";
   };
 
   const validate = () => {
     let newErrors: any = {};
 
-    if (!data.address) newErrors.address = "Address is required";
-    if (!data.graffitiOn) newErrors.graffitiOn = "Please select an option";
-    if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
-      newErrors.additionalInfo = "Additional Information is required";
-    }
+    if (!data.address)
+      newErrors.address =
+        "Please provide a location and remember to hit Search";
     if (!data.whereIsIt) newErrors.whereIsIt = "Please select an option";
-
+    if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
+      newErrors.additionalInfo = "Please describe the issue";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -106,15 +103,18 @@ const Graffiti = () => {
   if (showSuccess) {
     return (
       <>
-        <h4 className="fw-bold mb-4">Your Graffiti Report</h4>
+        <h4 className="fw-bold mb-4">Thank you for your report</h4>
+
         <AlertNavigation
           description={[
-            "Write down your reference ID: 260504-001201. Use it to track the status of your report.",
-            "Graffiti is abated within 72 hours being reported. However, due to location, weather or surface, abatement times may vary. Gang and Offensive graffiti is removed within 1 business day. In order to have gang/offensive graffiti elevated, residents should call the graffiti program directly at (408) 975-7233.",
+            "Your reference ID# is 260507-000018.",
+            "We'll also email you a confirmation.",
+            "Potholes (layer of asphalt missing with defined edges) are addressed in 2 business days. Repairs that are determined to be more complicated than a pothole can take up to 30 business days.",
+            "Please note: When you report a pothole that does not mean that the entire street will be re-paved."
           ]}
           primaryText="Track my report"
-          secondaryText="Return home"
           onPrimary={() => navigate("/track-report")}
+          secondaryText="Return home"
           onSecondary={() => navigate("/")}
         />
       </>
@@ -123,10 +123,71 @@ const Graffiti = () => {
   return (
     <div className="container mt-3 mb-4">
       {/* Header */}
-      <h4 className="fw-bold mb-4">Your Graffiti Report</h4>
-      <p className="text-muted">
-        Report graffiti on buildings, sidewalks, roads and structures.
-      </p>
+      <h4 className="fw-bold mb-4">Your Pothole Report</h4>
+      {/* Pothole Information */}
+      <div className="mb-4">
+        <p
+          className="text-muted"
+        >
+          A pothole is a hole in the street with a defined edge. Not a sinkhole
+          (rounded edge) or a crack in the road.
+        </p>
+
+        <h6 className="fw-bold mt-3">Please note:</h6>
+
+        <ol className="ps-3 mb-3">
+          <li>
+            When you report a pothole that does not mean that the entire street
+            will be re-paved.
+          </li>
+
+          <li>
+            Potholes (layer of asphalt missing with defined edges) are addressed
+            in 2 business days.
+          </li>
+
+          <li>
+            Repairs that are determined to be more complicated than a pothole
+            can take up to 30 business days.
+          </li>
+        </ol>
+
+        <div className="row g-3">
+          <div className="col-md-6">
+            <p className="mb-1" style={{ fontSize: "12px", fontWeight: 500 }}>
+              Sample Pothole - 2 Days
+            </p>
+
+            <img
+              src="src/assets/pothole-02.png"
+              alt="Pothole"
+              className="img-fluid rounded"
+              style={{
+                 width: "100%",
+    height: "180px",
+    objectFit: "cover",
+              }}
+            />
+          </div>
+
+          <div className="col-md-6">
+            <p className="mb-1" style={{ fontSize: "12px", fontWeight: 500 }}>
+              Sample Complicated Repair - 30 Days
+            </p>
+
+            <img
+              src="src\assets\pothole-new.png"
+              alt="Road Damage"
+              className="img-fluid rounded"
+              style={{
+                 width: "100%",
+    height: "180px",
+    objectFit: "cover",
+              }}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Photo Upload Section */}
       <div className="mb-3">
@@ -154,6 +215,8 @@ const Graffiti = () => {
           style={{ display: "none" }}
           onChange={handleImageUpload}
         />
+
+        {imageError && <p className="text-danger mt-2">{imageError}</p>}
 
         {/* Preview */}
         {images.length > 0 && (
@@ -193,8 +256,6 @@ const Graffiti = () => {
         )}
       </div>
 
-      {imageError && <p className="text-danger">{imageError}</p>}
-
       {/* Address Section */}
       <div className="mb-3">
         <label className="fw-bold">
@@ -215,12 +276,12 @@ const Graffiti = () => {
             setErrors((prev: any) => ({ ...prev, address: "" }));
           }}
         />
+
         {errors.address && <p className="text-danger">{errors.address}</p>}
 
         <button className="next-btn mb-3 search-btn">
           Search (Optional) 🔍
         </button>
-        
       </div>
 
       {/* Map */}
@@ -238,93 +299,6 @@ const Graffiti = () => {
             />
           </GoogleMap>
         </LoadScript>
-      </div>
-
-      {/* Graffiti On */}
-      <div className="mb-3">
-        <label className="fw-bold">
-          What is it on? <span className="text-danger">*</span>
-        </label>
-
-        <select
-          className="form-control"
-          value={data.graffitiOn}
-          onChange={(e) => {
-            setData({ ...data, graffitiOn: e.target.value });
-            setErrors((prev: any) => ({
-              ...prev,
-              graffitiOn: "",
-            }));
-          }}
-        >
-          <option value="">Select</option>
-          <option>Building</option>
-          <option>Sidewalk</option>
-          <option>Road</option>
-          <option>Other</option>
-        </select>
-
-        {errors.graffitiOn && (
-          <p className="text-danger">{errors.graffitiOn}</p>
-        )}
-      </div>
-
-      {/* Public Property */}
-      <div className="mb-3">
-        <label className="fw-bold">Is it on public property?</label>
-
-        <div className="mt-2">
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="public"
-              checked={data.isPublic === "yes"}
-              onChange={() => setData({ ...data, isPublic: "yes" })}
-            />
-            <label className="form-check-label">Yes</label>
-          </div>
-
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="public"
-              checked={data.isPublic === "no"}
-              onChange={() => setData({ ...data, isPublic: "no" })}
-            />
-            <label className="form-check-label">No</label>
-          </div>
-        </div>
-      </div>
-
-      {/* Offensive */}
-      <div className="mb-3">
-        <label className="fw-bold">Is it offensive?</label>
-
-        <div className="mt-2">
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="offensive"
-              checked={data.isOffensive === "yes"}
-              onChange={() => setData({ ...data, isOffensive: "yes" })}
-            />
-            <label className="form-check-label">Yes</label>
-          </div>
-
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="offensive"
-              checked={data.isOffensive === "no"}
-              onChange={() => setData({ ...data, isOffensive: "no" })}
-            />
-            <label className="form-check-label">No</label>
-          </div>
-        </div>
       </div>
 
       {/* Additional Info */}
@@ -436,4 +410,4 @@ const Graffiti = () => {
   );
 };
 
-export default Graffiti;
+export default Potholes;
