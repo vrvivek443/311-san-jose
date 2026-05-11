@@ -9,6 +9,7 @@ import Graffiti from "./components/Pages/graffiti/graffiti";
 import TrackReport from "./components/Pages/graffiti/Track-Report/track-report";
 import IllegalDumping from "./components/Pages/illegal-dumping/illegal-dumping";
 import Potholes from "./components/Pages/potholes/potholes";
+import StreetlightOutage from "./components/Pages/streetlight-outage/streetlight-outage";
 
 function App() {
   const navigate = useNavigate();
@@ -138,6 +139,7 @@ function App() {
             <Route path="/track-report" element={<TrackReport />}/>
             <Route path="/illegal-dumping" element={<IllegalDumping />} />
             <Route path="/pothole" element={<Potholes />} />
+            <Route path="/streetlight-outage" element={<StreetlightOutage />} />
           </Routes>
 
         </div>

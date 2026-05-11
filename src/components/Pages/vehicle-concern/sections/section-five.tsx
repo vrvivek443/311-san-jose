@@ -30,6 +30,7 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
     const [errorOption, setError] = React.useState("");
     const [errorPara, setParaError] = React.useState("");
     const [showISSModal, setShowISSModal] = useState(false);
+    const [emailError, setEmailError] = useState("");
     React.useEffect(() => {
       if (section4Value === "ISS" && data.day && data.time) {
         setShowISSModal(false);
@@ -515,9 +516,14 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
                 type="text"
                 className="form-control"
                 value={data.firstName || ""}
-                onChange={(e) =>
-                  onChange({ ...data, firstName: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  // Allow only letters and spaces
+                  if (/^[A-Za-z\s]*$/.test(value)) {
+                    onChange({ ...data, firstName: value });
+                  }
+                }}
               />{" "}
             </div>{" "}
             <div className="mb-3">
@@ -527,20 +533,46 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
                 type="text"
                 className="form-control"
                 value={data.lastName || ""}
-                onChange={(e) =>
-                  onChange({ ...data, lastName: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  // Allow only letters and spaces
+                  if (/^[A-Za-z\s]*$/.test(value)) {
+                    onChange({ ...data, lastName: value });
+                  }
+                }}
               />{" "}
             </div>{" "}
             <div className="mb-3">
-              {" "}
-              <label className="form-label">Email address:</label>{" "}
+              <label className="form-label">Email address:</label>
+
               <input
                 type="email"
-                className="form-control"
+                className={`form-control ${emailError ? "is-invalid" : ""}`}
                 value={data.email || ""}
-                onChange={(e) => onChange({ ...data, email: e.target.value })}
-              />{" "}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  onChange({
+                    ...data,
+                    email: value,
+                  });
+
+                  // Email Validation
+                  if (
+                    value.trim() !== "" &&
+                    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                  ) {
+                    setEmailError("Please enter a valid email address");
+                  } else {
+                    setEmailError("");
+                  }
+                }}
+              />
+
+              {emailError && (
+                <div className="invalid-feedback">{emailError}</div>
+              )}
             </div>{" "}
             <div className="mb-3">
               {" "}
@@ -550,7 +582,15 @@ const SectionFive = forwardRef<SectionFiveRef, SectionFiveProps>(
                 className="form-control"
                 placeholder="xxx-xxx-xxxx"
                 value={data.phone || ""}
-                onChange={(e) => onChange({ ...data, phone: e.target.value })}
+                maxLength={10}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  // Allow only numbers
+                  if (/^\d*$/.test(value)) {
+                    onChange({ ...data, phone: value });
+                  }
+                }}
               />
             </div>
           </div>

@@ -86,9 +86,7 @@ const SectionFour = forwardRef<SectionFourRef, SectionFourProps>(
           {options.map((option) => (
             <label
               key={option.code}
-              className={`list-group-item list-group-item-action d-flex gap-2 ${
-                data === option.code ? "active" : ""
-              }`}
+              className={`list-group-item list-group-item-action d-flex gap-2`}
               style={{ cursor: "pointer" }}
             >
               <input

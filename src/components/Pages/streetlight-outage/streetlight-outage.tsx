@@ -1,10 +1,10 @@
-import React,  { useState } from "react";
+import React, { useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
-import "./illegal-dumping.css";
+import "./streetlight-outage.css";
 
-const IllegalDumping = () => {
+const StreetlightOutage = () => {
   const navigate = useNavigate();
   const [images, setImages] = useState<File[]>([]);
   const [imageError, setImageError] = useState("");
@@ -36,79 +36,56 @@ const IllegalDumping = () => {
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      if (!files) return;
-  
-      let selectedFiles = Array.from(files);
-  
-      let hasSizeError = false;
-      let hasTypeError = false;
-  
-      const validFiles = selectedFiles.filter((file) => {
-        if (!file.type.startsWith("image/")) {
-          hasTypeError = true;
-          return false;
-        }
-  
-        if (file.size > 10 * 1024 * 1024) {
-          hasSizeError = true;
-          return false;
-        }
-  
-        return true;
-      });
-  
-      if (hasTypeError) {
-        setImageError("Only image files are allowed (JPG, PNG, etc.)");
-      } else if (hasSizeError) {
-        setImageError("One or more images exceed 10MB limit");
-      } else {
-        setImageError("");
+    const files = e.target.files;
+    if (!files) return;
+
+    let selectedFiles = Array.from(files);
+
+    let hasSizeError = false;
+    let hasTypeError = false;
+
+    const validFiles = selectedFiles.filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        hasTypeError = true;
+        return false;
       }
-  
-      
-      if (validFiles.length > 0) {
-        setImages((prev) => [...prev, ...validFiles]);
+
+      if (file.size > 10 * 1024 * 1024) {
+        hasSizeError = true;
+        return false;
       }
-  
-      e.target.value = "";
-    };
+
+      return true;
+    });
+
+    if (hasTypeError) {
+      setImageError("Only image files are allowed (JPG, PNG, etc.)");
+    } else if (hasSizeError) {
+      setImageError("One or more images exceed 10MB limit");
+    } else {
+      setImageError("");
+    }
+
+    if (validFiles.length > 0) {
+      setImages((prev) => [...prev, ...validFiles]);
+    }
+
+    e.target.value = "";
+  };
 
   const validate = () => {
-  let newErrors: any = {};
-  let isValid = true;
+    let newErrors: any = {};
 
-  // Address validation
-  if (!data.address) {
-    newErrors.address =
-      "Please provide a location and remember to hit Search";
-    isValid = false;
-  }
-
-  // Public view validation
-  if (!data.whereIsIt) {
-    newErrors.whereIsIt = "Please select an option";
-    isValid = false;
-  }
-
-  // Additional info validation
-  if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
-    newErrors.additionalInfo = "Please describe the issue";
-    isValid = false;
-  }
-
-  // Image validation
-  if (images.length === 0) {
-    setImageError("Please upload at least one image");
-    isValid = false;
-  } else {
-    setImageError("");
-  }
-
-  setErrors(newErrors);
-
-  return isValid;
-};
+    if (!data.address)
+      newErrors.address =
+        "Please provide a location and remember to hit Search";
+    if (!data.whereIsIt) newErrors.whereIsIt = "Please select an option";
+    if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
+      newErrors.additionalInfo = "Please describe the issue";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = () => {
     if (!validate()) return;
@@ -124,40 +101,35 @@ const IllegalDumping = () => {
   };
 
   if (showSuccess) {
-  return (
-    <>
-      <h4 className="fw-bold mb-4">
-        Thank you for your report, Vivek Vr!
-      </h4>
+    return (
+      <>
+        <h4 className="fw-bold mb-4">Thank you for your report</h4>
 
-      <AlertNavigation
-        description={[
-          "Your reference ID# is 260507-000018.",
-          "We'll also email you a confirmation.",
-          "The RAPID (Removing and Preventing Illegal Dumping) team will respond to reports of illegal dumping within 5 business days.",
-        ]}
-        primaryText="Track my report"
-        onPrimary={() => navigate("/track-report")}
-        secondaryText="Return home"
-onSecondary={() => navigate("/")}
-      />
-    </>
-  );
-}
+        <AlertNavigation
+          description={[
+            "Your reference ID# is 260507-000018.",
+            "We'll also email you a confirmation.",
+            "Potholes (layer of asphalt missing with defined edges) are addressed in 2 business days. Repairs that are determined to be more complicated than a pothole can take up to 30 business days.",
+            "Please note: When you report a pothole that does not mean that the entire street will be re-paved."
+          ]}
+          primaryText="Track my report"
+          onPrimary={() => navigate("/track-report")}
+          secondaryText="Return home"
+          onSecondary={() => navigate("/")}
+        />
+      </>
+    );
+  }
   return (
     <div className="container mt-3 mb-4">
       {/* Header */}
-      <h4 className="fw-bold mb-4">Your Illegal Dumping Report</h4>
-      <p className="text-muted">
-        Illegal dumping includes large amounts of garbage and junk left on City of San Jose streets or sidewalks.
-      </p>
+      <h4 className="fw-bold mb-4">Your Streetlight Outage Report</h4>
 
       {/* Photo Upload Section */}
       <div className="mb-3">
-        <label className="fw-bold">Add a Photo<span className="text-danger">*</span></label>
+        <label className="fw-bold">Add a Photo</label>
         <p className="text-muted" style={{ fontSize: "13px" }}>
-          Help us find it faster. Select any type of image format (Max 10MB
-          each)
+          Streetlights are lights on roads or sidewalks. Not lights inside parks and buildings, or traffic signals. Submit one report per light for multiple outages.
         </p>
 
         <div
@@ -179,9 +151,7 @@ onSecondary={() => navigate("/")}
           onChange={handleImageUpload}
         />
 
-        {imageError && (
-  <p className="text-danger mt-2">{imageError}</p>
-)}
+        {imageError && <p className="text-danger mt-2">{imageError}</p>}
 
         {/* Preview */}
         {images.length > 0 && (
@@ -313,10 +283,11 @@ onSecondary={() => navigate("/")}
 
       <div className="mb-3">
         <label className="fw-bold">
-          Allow public to view your report?<span className="text-danger">*</span>
+          Allow public to view your report?
+          <span className="text-danger">*</span>
         </label>
         <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
-          No one will see your name 
+          No one will see your name
         </p>
 
         <div className="mt-2">
@@ -374,4 +345,4 @@ onSecondary={() => navigate("/")}
   );
 };
 
-export default IllegalDumping;
+export default StreetlightOutage;
