@@ -3,12 +3,14 @@ import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
 import "./streetlight-outage.css";
+import Modal from "../../shared/modal/modal";
 
 const StreetlightOutage = () => {
   const navigate = useNavigate();
   const [images, setImages] = useState<File[]>([]);
   const [imageError, setImageError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const [data, setData] = useState({
     address: "",
@@ -147,358 +149,415 @@ const StreetlightOutage = () => {
     );
   }
   return (
-    <div className="container mt-3 mb-4">
-      {/* Header */}
-      <h4 className="fw-bold mb-4">Your Streetlight Outage Report</h4>
+    <>
+      <Modal
+        show={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+      >
+        <div className="text-start">
+          <h5 className="fw-bold mb-3">Please share your Feedback</h5>
 
-      {/* Photo Upload Section */}
-      <div className="mb-3">
-        <label className="fw-bold">Add a Photo</label>
-        <p className="text-muted" style={{ fontSize: "13px" }}>
-          Streetlights are lights on roads or sidewalks. Not lights inside parks
-          and buildings, or traffic signals. Submit one report per light for
-          multiple outages.
-        </p>
+          {/* Question 1 */}
+          <p className="fw-semibold">
+            How would you rate your overall experience using San Jose 311 to
+            enter a service request?
+            <span className="text-danger">*</span>
+          </p>
 
-        <div
-          className="border rounded d-flex flex-column align-items-center justify-content-center p-4"
-          style={{
-            cursor: "pointer",
-            background: "#f8f9fa",
-            border: "2px dashed #ccc",
-          }}
-          onClick={() => document.getElementById("fileInput")?.click()}
-          // ✅ Allow drag
-          onDragOver={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          // ✅ Handle drop
-          onDrop={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
+          {["Very Good", "Good", "Neutral", "Bad", "Very Bad"].map((item) => (
+            <div className="form-check" key={item}>
+              <input type="radio" className="form-check-input" name="rating" />
+              <label className="form-check-label">{item}</label>
+            </div>
+          ))}
 
-            const files = e.dataTransfer.files;
+          {/* Question 2 */}
+          <p className="fw-semibold mt-3">
+            How did you hear about San Jose 311?
+            <span className="text-danger">*</span>
+          </p>
 
-            if (!files || files.length === 0) return;
+          {[
+            "I am an active San Jose 311 user",
+            "City of San Jose",
+            "Social Media",
+            "Flyers/Posters",
+            "Events",
+            "Friend/Family",
+            "Radio",
+            "Newspaper/Newsletter",
+            "Other",
+          ].map((item) => (
+            <div className="form-check" key={item}>
+              <input type="radio" className="form-check-input" name="source" />
+              <label className="form-check-label">{item}</label>
+            </div>
+          ))}
 
-            handleDroppedFiles(files);
-          }}
-        >
-          <div style={{ fontSize: "24px" }}>📷</div>
-          <p className="mb-0">Drag file here or</p>
-          <span className="text-primary">choose from folder</span>
-        </div>
-
-        <input
-          id="fileInput"
-          type="file"
-          multiple
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={handleImageUpload}
-        />
-
-        {imageError && <p className="text-danger mt-2">{imageError}</p>}
-
-        {/* Preview */}
-        {images.length > 0 && (
-          <div className="mt-3 d-flex flex-wrap gap-2">
-            {images.map((img, index) => (
-              <div
-                key={index}
-                style={{
-                  position: "relative",
-                  width: "80px",
-                  height: "80px",
-                }}
-              >
-                <img
-                  src={URL.createObjectURL(img)}
-                  alt="preview"
-                  width={80}
-                  height={80}
-                  style={{
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                  }}
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setImages((prev) => prev.filter((_, i) => i !== index))
-                  }
-                  className="new-button"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+          {/* Submit Button */}
+          <div className="text-end mt-3">
+            <button
+              className="btn btn-info text-white"
+              onClick={() => setShowFeedbackModal(false)}
+            >
+              Submit
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      </Modal>
+      <div className="container mt-3 mb-4">
+        {/* Header */}
+        <h4 className="fw-bold mb-4">Your Streetlight Outage Report</h4>
 
-      {/* Address Section */}
-      <div className="mb-3">
-        <label className="fw-bold">
-          Where is it? <span className="text-danger">*</span>
-        </label>
+        {/* Photo Upload Section */}
+        <div className="mb-3">
+          <label className="fw-bold">Add a Photo</label>
+          <p className="text-muted" style={{ fontSize: "13px" }}>
+            Streetlights are lights on roads or sidewalks. Not lights inside
+            parks and buildings, or traffic signals. Submit one report per light
+            for multiple outages.
+          </p>
 
-        <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
-          (Only valid city locations are accepted)
-        </p>
+          <div
+            className="border rounded d-flex flex-column align-items-center justify-content-center p-4"
+            style={{
+              cursor: "pointer",
+              background: "#f8f9fa",
+              border: "2px dashed #ccc",
+            }}
+            onClick={() => document.getElementById("fileInput")?.click()}
+            // ✅ Allow drag
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            // ✅ Handle drop
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
 
-        <input
-          type="text"
-          className="form-control mb-2"
-          placeholder="Enter address"
-          value={data.address}
-          onChange={(e) => {
-            setData({ ...data, address: e.target.value });
-            setErrors((prev: any) => ({ ...prev, address: "" }));
-          }}
-        />
+              const files = e.dataTransfer.files;
 
-        {errors.address && <p className="text-danger">{errors.address}</p>}
+              if (!files || files.length === 0) return;
 
-        <button className="next-btn mb-3 search-btn">
-          Search (Optional) 🔍
-        </button>
-      </div>
-
-      {/* Map */}
-      <div className="mb-3">
-        <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={data.position}
-            zoom={13}
+              handleDroppedFiles(files);
+            }}
           >
-            <Marker
-              position={data.position}
-              draggable
-              onDragEnd={handleDragEnd}
-            />
-          </GoogleMap>
-        </LoadScript>
-      </div>
+            <div style={{ fontSize: "24px" }}>📷</div>
+            <p className="mb-0">Drag file here or</p>
+            <span className="text-primary">choose from folder</span>
+          </div>
 
-      {/* Pole Number */}
-      <div className="mb-3">
-        <label className="fw-bold">
-          What is the pole number?
-          <span className="text-danger">*</span>
-        </label>
+          <input
+            id="fileInput"
+            type="file"
+            multiple
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleImageUpload}
+          />
 
-        <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
-          All City of San José streetlight pole numbers should include a letter
-          (e.g. 19L2897).
-        </p>
+          {imageError && <p className="text-danger mt-2">{imageError}</p>}
 
-        <p className="text-danger mb-2" style={{ fontSize: "13px" }}>
-          If you cannot read the number or you are unable to enter it here,
-          please call 408-794-1900 with the nearest address to report the
-          streetlight outage.
-        </p>
+          {/* Preview */}
+          {images.length > 0 && (
+            <div className="mt-3 d-flex flex-wrap gap-2">
+              {images.map((img, index) => (
+                <div
+                  key={index}
+                  style={{
+                    position: "relative",
+                    width: "80px",
+                    height: "80px",
+                  }}
+                >
+                  <img
+                    src={URL.createObjectURL(img)}
+                    alt="preview"
+                    width={80}
+                    height={80}
+                    style={{
+                      objectFit: "cover",
+                      borderRadius: "6px",
+                    }}
+                  />
 
-        <input
-          type="text"
-          className="form-control"
-          maxLength={7}
-          placeholder="Enter pole number"
-          value={data.poleNumber}
-          onChange={(e) => {
-            const value = e.target.value.toUpperCase();
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setImages((prev) => prev.filter((_, i) => i !== index))
+                    }
+                    className="new-button"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-            // Allow only letters and numbers
-            if (/^[A-Z0-9]*$/.test(value)) {
-              setData({
-                ...data,
-                poleNumber: value,
-              });
+        {/* Address Section */}
+        <div className="mb-3">
+          <label className="fw-bold">
+            Where is it? <span className="text-danger">*</span>
+          </label>
 
-              setErrors((prev: any) => ({
-                ...prev,
-                poleNumber: "",
-              }));
-            }
-          }}
-        />
+          <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
+            (Only valid city locations are accepted)
+          </p>
 
-        <p className="text-muted mt-1" style={{ fontSize: "12px" }}>
-          7 characters allowed
-        </p>
+          <input
+            type="text"
+            className="form-control mb-2"
+            placeholder="Enter address"
+            value={data.address}
+            onChange={(e) => {
+              setData({ ...data, address: e.target.value });
+              setErrors((prev: any) => ({ ...prev, address: "" }));
+            }}
+          />
 
-        {errors.poleNumber && (
-          <p className="text-danger">{errors.poleNumber}</p>
-        )}
-      </div>
+          {errors.address && <p className="text-danger">{errors.address}</p>}
 
-      {/* Multiple Lights Impacted */}
-      <div className="mb-3">
-        <label className="fw-bold">
-          Are multiple lights in a row impacted?
-          <span className="text-danger">*</span>
-        </label>
+          <button className="next-btn mb-3 search-btn">
+            Search (Optional) 🔍
+          </button>
+        </div>
 
-        <div className="mt-2">
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="multipleLightsImpacted"
-              checked={data.multipleLightsImpacted === "yes"}
-              onChange={() => {
+        {/* Map */}
+        <div className="mb-3">
+          <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
+            <GoogleMap
+              mapContainerStyle={containerStyle}
+              center={data.position}
+              zoom={13}
+            >
+              <Marker
+                position={data.position}
+                draggable
+                onDragEnd={handleDragEnd}
+              />
+            </GoogleMap>
+          </LoadScript>
+        </div>
+
+        {/* Pole Number */}
+        <div className="mb-3">
+          <label className="fw-bold">
+            What is the pole number?
+            <span className="text-danger">*</span>
+          </label>
+
+          <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
+            All City of San José streetlight pole numbers should include a
+            letter (e.g. 19L2897).
+          </p>
+
+          <p className="text-danger mb-2" style={{ fontSize: "13px" }}>
+            If you cannot read the number or you are unable to enter it here,
+            please call 408-794-1900 with the nearest address to report the
+            streetlight outage.
+          </p>
+
+          <input
+            type="text"
+            className="form-control"
+            maxLength={7}
+            placeholder="Enter pole number"
+            value={data.poleNumber}
+            onChange={(e) => {
+              const value = e.target.value.toUpperCase();
+
+              // Allow only letters and numbers
+              if (/^[A-Z0-9]*$/.test(value)) {
                 setData({
                   ...data,
-                  multipleLightsImpacted: "yes",
+                  poleNumber: value,
                 });
 
                 setErrors((prev: any) => ({
                   ...prev,
-                  multipleLightsImpacted: "",
+                  poleNumber: "",
                 }));
-              }}
-            />
+              }
+            }}
+          />
 
-            <label className="form-check-label">Yes</label>
-          </div>
+          <p className="text-muted mt-1" style={{ fontSize: "12px" }}>
+            7 characters allowed
+          </p>
 
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="multipleLightsImpacted"
-              checked={data.multipleLightsImpacted === "no"}
-              onChange={() => {
-                setData({
-                  ...data,
-                  multipleLightsImpacted: "no",
-                });
-
-                setErrors((prev: any) => ({
-                  ...prev,
-                  multipleLightsImpacted: "",
-                }));
-              }}
-            />
-
-            <label className="form-check-label">No</label>
-          </div>
+          {errors.poleNumber && (
+            <p className="text-danger">{errors.poleNumber}</p>
+          )}
         </div>
 
-        {errors.multipleLightsImpacted && (
-          <p className="text-danger">{errors.multipleLightsImpacted}</p>
+        {/* Multiple Lights Impacted */}
+        <div className="mb-3">
+          <label className="fw-bold">
+            Are multiple lights in a row impacted?
+            <span className="text-danger">*</span>
+          </label>
+
+          <div className="mt-2">
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                name="multipleLightsImpacted"
+                checked={data.multipleLightsImpacted === "yes"}
+                onChange={() => {
+                  setData({
+                    ...data,
+                    multipleLightsImpacted: "yes",
+                  });
+
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    multipleLightsImpacted: "",
+                  }));
+                }}
+              />
+
+              <label className="form-check-label">Yes</label>
+            </div>
+
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                name="multipleLightsImpacted"
+                checked={data.multipleLightsImpacted === "no"}
+                onChange={() => {
+                  setData({
+                    ...data,
+                    multipleLightsImpacted: "no",
+                  });
+
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    multipleLightsImpacted: "",
+                  }));
+                }}
+              />
+
+              <label className="form-check-label">No</label>
+            </div>
+          </div>
+
+          {errors.multipleLightsImpacted && (
+            <p className="text-danger">{errors.multipleLightsImpacted}</p>
+          )}
+        </div>
+
+        {/* Additional Info */}
+        <div className="mb-3">
+          <label className="fw-semibold">
+            Tell us more<span className="text-danger">*</span>
+          </label>
+          <textarea
+            className="form-control"
+            rows={3}
+            placeholder="Add details here"
+            value={data.additionalInfo}
+            onChange={(e) => {
+              let value = e.target.value;
+
+              // ✅ HARD LIMIT: stop at 4000 chars
+              if (value.length > 4000) return;
+
+              setData({ ...data, additionalInfo: value });
+
+              if (value.trim().length === 0) {
+                setErrors((prev: any) => ({
+                  ...prev,
+                  additionalInfo: "This field is required",
+                }));
+              } else {
+                setErrors((prev: any) => ({
+                  ...prev,
+                  additionalInfo: "",
+                }));
+              }
+            }}
+          />
+          <p
+            className={`mt-1 ${
+              data.additionalInfo.length === 4000 ? "text-danger" : "text-muted"
+            }`}
+            style={{ fontSize: "12px" }}
+          >
+            {data.additionalInfo.length}/4000 characters
+          </p>
+
+          {errors.additionalInfo && (
+            <p className="text-danger mb-1">{errors.additionalInfo}</p>
+          )}
+        </div>
+
+        <div className="mb-3">
+          <label className="fw-bold">
+            Allow public to view your report?
+            <span className="text-danger">*</span>
+          </label>
+          <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
+            No one will see your name
+          </p>
+
+          <div className="mt-2">
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                name="isView"
+                checked={data.isView === "yes"}
+                onChange={() => {
+                  setData({ ...data, isView: "yes" });
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    isView: "",
+                  }));
+                }}
+              />
+              <label className="form-check-label">Yes</label>
+            </div>
+
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                name="offensive"
+                checked={data.isView === "no"}
+                onChange={() => {
+                  setData({ ...data, isView: "no" });
+                  setErrors((prev: any) => ({
+                    ...prev,
+                    isView: "",
+                  }));
+                }}
+              />
+              <label className="form-check-label">No</label>
+            </div>
+          </div>
+          {errors.isView && <p className="text-danger">{errors.isView}</p>}
+        </div>
+
+        {/* Submit */}
+        <button className="next-btn w-100" onClick={handleSubmit}>
+          Submit
+        </button>
+
+        {isSubmitting && (
+          <div className="loader-overlay">
+            <div className="loader-box">
+              <div className="spinner"></div>
+              <p>Submitting your report...</p>
+            </div>
+          </div>
         )}
       </div>
-
-      {/* Additional Info */}
-      <div className="mb-3">
-        <label className="fw-semibold">
-          Tell us more<span className="text-danger">*</span>
-        </label>
-        <textarea
-          className="form-control"
-          rows={3}
-          placeholder="Add details here"
-          value={data.additionalInfo}
-          onChange={(e) => {
-            let value = e.target.value;
-
-            // ✅ HARD LIMIT: stop at 4000 chars
-            if (value.length > 4000) return;
-
-            setData({ ...data, additionalInfo: value });
-
-            if (value.trim().length === 0) {
-              setErrors((prev: any) => ({
-                ...prev,
-                additionalInfo: "This field is required",
-              }));
-            } else {
-              setErrors((prev: any) => ({
-                ...prev,
-                additionalInfo: "",
-              }));
-            }
-          }}
-        />
-        <p
-          className={`mt-1 ${
-            data.additionalInfo.length === 4000 ? "text-danger" : "text-muted"
-          }`}
-          style={{ fontSize: "12px" }}
-        >
-          {data.additionalInfo.length}/4000 characters
-        </p>
-
-        {errors.additionalInfo && (
-          <p className="text-danger mb-1">{errors.additionalInfo}</p>
-        )}
-      </div>
-
-      <div className="mb-3">
-        <label className="fw-bold">
-          Allow public to view your report?
-          <span className="text-danger">*</span>
-        </label>
-        <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
-          No one will see your name
-        </p>
-
-        <div className="mt-2">
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="isView"
-              checked={data.isView === "yes"}
-              onChange={() => {
-                setData({ ...data, isView: "yes" });
-                setErrors((prev: any) => ({
-                  ...prev,
-                  isView: "",
-                }));
-              }}
-            />
-            <label className="form-check-label">Yes</label>
-          </div>
-
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="offensive"
-              checked={data.isView === "no"}
-              onChange={() => {
-                setData({ ...data, isView: "no" });
-                setErrors((prev: any) => ({
-                  ...prev,
-                  isView: "",
-                }));
-              }}
-            />
-            <label className="form-check-label">No</label>
-          </div>
-        </div>
-        {errors.isView && <p className="text-danger">{errors.isView}</p>}
-      </div>
-
-      {/* Submit */}
-      <button className="next-btn w-100" onClick={handleSubmit}>
-        Submit
-      </button>
-
-      {isSubmitting && (
-        <div className="loader-overlay">
-          <div className="loader-box">
-            <div className="spinner"></div>
-            <p>Submitting your report...</p>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
