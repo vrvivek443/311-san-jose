@@ -155,7 +155,7 @@ function App() {
 
       {/* Footer */}
       <footer className="page-footer">
-        <p className="mb-0">Copyright &copy; 2022. All rights reserved.</p>
+        <p className="mb-0">Copyright &copy; 2026. All rights reserved.</p>
       </footer>
 
     </div>

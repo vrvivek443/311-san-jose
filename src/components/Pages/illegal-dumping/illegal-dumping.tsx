@@ -16,12 +16,47 @@ const IllegalDumping = () => {
     graffitiOn: "",
     isPublic: "",
     isOffensive: "",
-    whereIsIt: "",
+    isView: "no",
     position: { lat: 37.3382, lng: -121.8863 }, // San Jose default
   });
 
   const [errors, setErrors] = useState<any>({});
   const [showSuccess, setShowSuccess] = useState(false);
+  const handleDroppedFiles = (files: FileList) => {
+    let selectedFiles = Array.from(files);
+
+    let hasSizeError = false;
+    let hasTypeError = false;
+
+    const validFiles = selectedFiles.filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        hasTypeError = true;
+        return false;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        hasSizeError = true;
+        return false;
+      }
+
+      return true;
+    });
+
+    if (hasTypeError) {
+      setImageError("Only image files are allowed (JPG, PNG, etc.)");
+    } else if (hasSizeError) {
+      setImageError("One or more images exceed 10MB limit");
+    } else {
+      setImageError("");
+    }
+
+    if (validFiles.length > 0) {
+      setImages((prev) => [...prev, ...validFiles]);
+
+      // ✅ Clear image required error
+      setImageError("");
+    }
+  };
 
   const containerStyle = {
     width: "100%",
@@ -37,39 +72,10 @@ const IllegalDumping = () => {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
+  
       if (!files) return;
   
-      let selectedFiles = Array.from(files);
-  
-      let hasSizeError = false;
-      let hasTypeError = false;
-  
-      const validFiles = selectedFiles.filter((file) => {
-        if (!file.type.startsWith("image/")) {
-          hasTypeError = true;
-          return false;
-        }
-  
-        if (file.size > 10 * 1024 * 1024) {
-          hasSizeError = true;
-          return false;
-        }
-  
-        return true;
-      });
-  
-      if (hasTypeError) {
-        setImageError("Only image files are allowed (JPG, PNG, etc.)");
-      } else if (hasSizeError) {
-        setImageError("One or more images exceed 10MB limit");
-      } else {
-        setImageError("");
-      }
-  
-      
-      if (validFiles.length > 0) {
-        setImages((prev) => [...prev, ...validFiles]);
-      }
+      handleDroppedFiles(files);
   
       e.target.value = "";
     };
@@ -86,8 +92,8 @@ const IllegalDumping = () => {
   }
 
   // Public view validation
-  if (!data.whereIsIt) {
-    newErrors.whereIsIt = "Please select an option";
+  if (!data.isView) {
+    newErrors.isView = "Please select an option";
     isValid = false;
   }
 
@@ -162,8 +168,28 @@ onSecondary={() => navigate("/")}
 
         <div
           className="border rounded d-flex flex-column align-items-center justify-content-center p-4"
-          style={{ cursor: "pointer", background: "#f8f9fa" }}
+          style={{
+            cursor: "pointer",
+            background: "#f8f9fa",
+            border: "2px dashed #ccc",
+          }}
           onClick={() => document.getElementById("fileInput")?.click()}
+          // ✅ Allow drag
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          // ✅ Handle drop
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const files = e.dataTransfer.files;
+
+            if (!files || files.length === 0) return;
+
+            handleDroppedFiles(files);
+          }}
         >
           <div style={{ fontSize: "24px" }}>📷</div>
           <p className="mb-0">Drag file here or</p>
@@ -324,10 +350,10 @@ onSecondary={() => navigate("/")}
             <input
               type="radio"
               className="form-check-input"
-              name="whereIsIt"
-              checked={data.whereIsIt === "yes"}
+              name="isView"
+              checked={data.isView === "yes"}
               onChange={() => {
-                setData({ ...data, whereIsIt: "yes" });
+                setData({ ...data, isView: "yes" });
                 setErrors((prev: any) => ({
                   ...prev,
                   whereIsIt: "",
@@ -342,19 +368,19 @@ onSecondary={() => navigate("/")}
               type="radio"
               className="form-check-input"
               name="offensive"
-              checked={data.whereIsIt === "no"}
+              checked={data.isView === "no"}
               onChange={() => {
-                setData({ ...data, whereIsIt: "no" });
+                setData({ ...data, isView: "no" });
                 setErrors((prev: any) => ({
                   ...prev,
-                  whereIsIt: "",
+                  isView: "",
                 }));
               }}
             />
             <label className="form-check-label">No</label>
           </div>
         </div>
-        {errors.whereIsIt && <p className="text-danger">{errors.whereIsIt}</p>}
+        {errors.whereIsIt && <p className="text-danger">{errors.isView}</p>}
       </div>
 
       {/* Submit */}

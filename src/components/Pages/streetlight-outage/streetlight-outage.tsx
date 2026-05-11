@@ -13,11 +13,10 @@ const StreetlightOutage = () => {
   const [data, setData] = useState({
     address: "",
     additionalInfo: "",
-    graffitiOn: "",
-    isPublic: "",
-    isOffensive: "",
-    whereIsIt: "",
-    position: { lat: 37.3382, lng: -121.8863 }, // San Jose default
+    poleNumber: "",
+    multipleLightsImpacted: "",
+    isView: "no",
+    position: { lat: 37.3382, lng: -121.8863 },
   });
 
   const [errors, setErrors] = useState<any>({});
@@ -35,10 +34,7 @@ const StreetlightOutage = () => {
     setData({ ...data, position: { lat, lng } });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
+  const handleDroppedFiles = (files: FileList) => {
     let selectedFiles = Array.from(files);
 
     let hasSizeError = false;
@@ -68,7 +64,18 @@ const StreetlightOutage = () => {
 
     if (validFiles.length > 0) {
       setImages((prev) => [...prev, ...validFiles]);
+
+      // ✅ Clear image required error
+      setImageError("");
     }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+
+    if (!files) return;
+
+    handleDroppedFiles(files);
 
     e.target.value = "";
   };
@@ -76,14 +83,33 @@ const StreetlightOutage = () => {
   const validate = () => {
     let newErrors: any = {};
 
-    if (!data.address)
+    if (!data.address) {
       newErrors.address =
         "Please provide a location and remember to hit Search";
-    if (!data.whereIsIt) newErrors.whereIsIt = "Please select an option";
+    }
+
+    // ✅ Pole Number validation
+    if (!data.poleNumber || data.poleNumber.trim() === "") {
+      newErrors.poleNumber = "Please enter the pole number.";
+    }
+
+    // ✅ Multiple Lights validation
+    if (!data.multipleLightsImpacted) {
+      newErrors.multipleLightsImpacted = "Please select an option";
+    }
+
+    // ✅ Public View validation
+    if (!data.isView) {
+      newErrors.isView = "Please select an option";
+    }
+
+    // ✅ Additional Info validation
     if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
       newErrors.additionalInfo = "Please describe the issue";
     }
+
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -110,7 +136,7 @@ const StreetlightOutage = () => {
             "Your reference ID# is 260507-000018.",
             "We'll also email you a confirmation.",
             "Potholes (layer of asphalt missing with defined edges) are addressed in 2 business days. Repairs that are determined to be more complicated than a pothole can take up to 30 business days.",
-            "Please note: When you report a pothole that does not mean that the entire street will be re-paved."
+            "Please note: When you report a pothole that does not mean that the entire street will be re-paved.",
           ]}
           primaryText="Track my report"
           onPrimary={() => navigate("/track-report")}
@@ -129,13 +155,35 @@ const StreetlightOutage = () => {
       <div className="mb-3">
         <label className="fw-bold">Add a Photo</label>
         <p className="text-muted" style={{ fontSize: "13px" }}>
-          Streetlights are lights on roads or sidewalks. Not lights inside parks and buildings, or traffic signals. Submit one report per light for multiple outages.
+          Streetlights are lights on roads or sidewalks. Not lights inside parks
+          and buildings, or traffic signals. Submit one report per light for
+          multiple outages.
         </p>
 
         <div
           className="border rounded d-flex flex-column align-items-center justify-content-center p-4"
-          style={{ cursor: "pointer", background: "#f8f9fa" }}
+          style={{
+            cursor: "pointer",
+            background: "#f8f9fa",
+            border: "2px dashed #ccc",
+          }}
           onClick={() => document.getElementById("fileInput")?.click()}
+          // ✅ Allow drag
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          // ✅ Handle drop
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const files = e.dataTransfer.files;
+
+            if (!files || files.length === 0) return;
+
+            handleDroppedFiles(files);
+          }}
         >
           <div style={{ fontSize: "24px" }}>📷</div>
           <p className="mb-0">Drag file here or</p>
@@ -236,6 +284,115 @@ const StreetlightOutage = () => {
         </LoadScript>
       </div>
 
+      {/* Pole Number */}
+      <div className="mb-3">
+        <label className="fw-bold">
+          What is the pole number?
+          <span className="text-danger">*</span>
+        </label>
+
+        <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
+          All City of San José streetlight pole numbers should include a letter
+          (e.g. 19L2897).
+        </p>
+
+        <p className="text-danger mb-2" style={{ fontSize: "13px" }}>
+          If you cannot read the number or you are unable to enter it here,
+          please call 408-794-1900 with the nearest address to report the
+          streetlight outage.
+        </p>
+
+        <input
+          type="text"
+          className="form-control"
+          maxLength={7}
+          placeholder="Enter pole number"
+          value={data.poleNumber}
+          onChange={(e) => {
+            const value = e.target.value.toUpperCase();
+
+            // Allow only letters and numbers
+            if (/^[A-Z0-9]*$/.test(value)) {
+              setData({
+                ...data,
+                poleNumber: value,
+              });
+
+              setErrors((prev: any) => ({
+                ...prev,
+                poleNumber: "",
+              }));
+            }
+          }}
+        />
+
+        <p className="text-muted mt-1" style={{ fontSize: "12px" }}>
+          7 characters allowed
+        </p>
+
+        {errors.poleNumber && (
+          <p className="text-danger">{errors.poleNumber}</p>
+        )}
+      </div>
+
+      {/* Multiple Lights Impacted */}
+      <div className="mb-3">
+        <label className="fw-bold">
+          Are multiple lights in a row impacted?
+          <span className="text-danger">*</span>
+        </label>
+
+        <div className="mt-2">
+          <div className="form-check">
+            <input
+              type="radio"
+              className="form-check-input"
+              name="multipleLightsImpacted"
+              checked={data.multipleLightsImpacted === "yes"}
+              onChange={() => {
+                setData({
+                  ...data,
+                  multipleLightsImpacted: "yes",
+                });
+
+                setErrors((prev: any) => ({
+                  ...prev,
+                  multipleLightsImpacted: "",
+                }));
+              }}
+            />
+
+            <label className="form-check-label">Yes</label>
+          </div>
+
+          <div className="form-check">
+            <input
+              type="radio"
+              className="form-check-input"
+              name="multipleLightsImpacted"
+              checked={data.multipleLightsImpacted === "no"}
+              onChange={() => {
+                setData({
+                  ...data,
+                  multipleLightsImpacted: "no",
+                });
+
+                setErrors((prev: any) => ({
+                  ...prev,
+                  multipleLightsImpacted: "",
+                }));
+              }}
+            />
+
+            <label className="form-check-label">No</label>
+          </div>
+        </div>
+
+        {errors.multipleLightsImpacted && (
+          <p className="text-danger">{errors.multipleLightsImpacted}</p>
+        )}
+      </div>
+
       {/* Additional Info */}
       <div className="mb-3">
         <label className="fw-semibold">
@@ -295,13 +452,13 @@ const StreetlightOutage = () => {
             <input
               type="radio"
               className="form-check-input"
-              name="whereIsIt"
-              checked={data.whereIsIt === "yes"}
+              name="isView"
+              checked={data.isView === "yes"}
               onChange={() => {
-                setData({ ...data, whereIsIt: "yes" });
+                setData({ ...data, isView: "yes" });
                 setErrors((prev: any) => ({
                   ...prev,
-                  whereIsIt: "",
+                  isView: "",
                 }));
               }}
             />
@@ -313,19 +470,19 @@ const StreetlightOutage = () => {
               type="radio"
               className="form-check-input"
               name="offensive"
-              checked={data.whereIsIt === "no"}
+              checked={data.isView === "no"}
               onChange={() => {
-                setData({ ...data, whereIsIt: "no" });
+                setData({ ...data, isView: "no" });
                 setErrors((prev: any) => ({
                   ...prev,
-                  whereIsIt: "",
+                  isView: "",
                 }));
               }}
             />
             <label className="form-check-label">No</label>
           </div>
         </div>
-        {errors.whereIsIt && <p className="text-danger">{errors.whereIsIt}</p>}
+        {errors.isView && <p className="text-danger">{errors.isView}</p>}
       </div>
 
       {/* Submit */}
