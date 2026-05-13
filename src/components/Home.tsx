@@ -21,7 +21,7 @@ import containerissue from "../assets/logo-Images/cart-issues.png";
 import missedcollection from "../assets/logo-Images/missed-collection.png";
 import servicenewhomes from "../assets/logo-Images/create-new-services.png";
 import mycollectionscheduele from "../assets/logo-Images/collection-schedule.png";
-import Modal from "../components/shared/modal/modal"
+import Modal from "../components/shared/modal/modal";
 
 // FAQ items
 const faqItems = [
@@ -62,7 +62,7 @@ const reportItems = [
   { img: other, label: "Other Issues", path: "/other-issues" },
   { img: fire, label: "Illegal Fireworks", path: "/illegal-fireworks" },
   { img: wifi, label: "Community WiFi", path: "/community-wifi" },
-  { img: sewer, label: "Sewer / Water Issues", path: "/sewer-water" },
+  { img: sewer, label: "Sewer / Water Issues", path: "/sewer-issues" },
 ];
 
 const lookingitems = [
@@ -124,6 +124,8 @@ const Home = () => {
                   });
 
                   setShowModal(true);
+                } else if (item.path === "/streetlight-outage") {
+                  navigate("/streetlight-warning");
                 } else {
                   item.path && navigate(item.path);
                 }
@@ -140,14 +142,14 @@ const Home = () => {
       </div>
 
       <Modal
-      show={showModal}
-      onClose={() => setShowModal(false)}
-      message={modalData?.message || ""}
-      primaryText={modalData?.primaryText || ""}
-      secondaryText={modalData?.secondaryText || ""}
-      onPrimary={modalData?.onPrimary || (() => {})}
-      onSecondary={modalData?.onSecondary || (() => {})}
-    />
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        message={modalData?.message || ""}
+        primaryText={modalData?.primaryText || ""}
+        secondaryText={modalData?.secondaryText || ""}
+        onPrimary={modalData?.onPrimary || (() => {})}
+        onSecondary={modalData?.onSecondary || (() => {})}
+      />
       {/* Looking for section */}
       <div className="dashboard">
         <h3 className="section-title">Looking for</h3>
@@ -202,7 +204,6 @@ const Home = () => {
           ))}
         </div>
       </div>
-
     </div>
   );
 };

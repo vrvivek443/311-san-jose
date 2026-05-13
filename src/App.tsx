@@ -10,6 +10,11 @@ import TrackReport from "./components/Pages/graffiti/Track-Report/track-report";
 import IllegalDumping from "./components/Pages/illegal-dumping/illegal-dumping";
 import Potholes from "./components/Pages/potholes/potholes";
 import StreetlightOutage from "./components/Pages/streetlight-outage/streetlight-outage";
+import OtherIssues from "./components/Pages/other-issues/other-issues";
+import IllegalFirework from "./components/Pages/illegal-firework/illegal-firework";
+import CommunityWifi from "./components/Pages/community-wifi/community-wifi";
+import SewageIssues from "./components/Pages/sewage-issues/sewage-issues";
+import StreetlightWarning from "./components/Pages/streetlight-outage/streelight-warning-alert";
 
 function App() {
   const navigate = useNavigate();
@@ -140,6 +145,11 @@ function App() {
             <Route path="/illegal-dumping" element={<IllegalDumping />} />
             <Route path="/pothole" element={<Potholes />} />
             <Route path="/streetlight-outage" element={<StreetlightOutage />} />
+            <Route path="/streetlight-warning" element={<StreetlightWarning />} />
+            <Route path="/other-issues" element={<OtherIssues />} />
+            <Route path="/illegal-fireworks" element={<IllegalFirework />} />
+            <Route path="/community-wifi" element={<CommunityWifi />} />
+            <Route path="/sewage-issues" element={<SewageIssues />} />
           </Routes>
 
         </div>

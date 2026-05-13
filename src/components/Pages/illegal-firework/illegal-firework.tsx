@@ -2,15 +2,16 @@ import React, { useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
-import "./illegal-dumping.css";
 import Modal from "../../shared/modal/modal";
 
-const IllegalDumping = () => {
+const IllegalFirework = () => {
   const navigate = useNavigate();
   const [images, setImages] = useState<File[]>([]);
-  const [imageError, setImageError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [incidentDate, setIncidentDate] = useState("");
+  const [incidentTime, setIncidentTime] = useState("");
+  const [incidentLocation, setIncidentLocation] = useState("");
 
   const [data, setData] = useState({
     address: "",
@@ -24,41 +25,6 @@ const IllegalDumping = () => {
 
   const [errors, setErrors] = useState<any>({});
   const [showSuccess, setShowSuccess] = useState(false);
-  const handleDroppedFiles = (files: FileList) => {
-    let selectedFiles = Array.from(files);
-
-    let hasSizeError = false;
-    let hasTypeError = false;
-
-    const validFiles = selectedFiles.filter((file) => {
-      if (!file.type.startsWith("image/")) {
-        hasTypeError = true;
-        return false;
-      }
-
-      if (file.size > 10 * 1024 * 1024) {
-        hasSizeError = true;
-        return false;
-      }
-
-      return true;
-    });
-
-    if (hasTypeError) {
-      setImageError("Only image files are allowed (JPG, PNG, etc.)");
-    } else if (hasSizeError) {
-      setImageError("One or more images exceed 10MB limit");
-    } else {
-      setImageError("");
-    }
-
-    if (validFiles.length > 0) {
-      setImages((prev) => [...prev, ...validFiles]);
-
-      // ✅ Clear image required error
-      setImageError("");
-    }
-  };
 
   const containerStyle = {
     width: "100%",
@@ -72,15 +38,6 @@ const IllegalDumping = () => {
     setData({ ...data, position: { lat, lng } });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-
-    if (!files) return;
-
-    handleDroppedFiles(files);
-
-    e.target.value = "";
-  };
 
   const validate = () => {
     let newErrors: any = {};
@@ -105,13 +62,6 @@ const IllegalDumping = () => {
       isValid = false;
     }
 
-    // Image validation
-    if (images.length === 0) {
-      setImageError("Please upload at least one image");
-      isValid = false;
-    } else {
-      setImageError("");
-    }
 
     setErrors(newErrors);
 
@@ -209,111 +159,136 @@ const IllegalDumping = () => {
         </div>
       </Modal>
       <div className="container mt-3 mb-4">
-        {/* Header */}
-        <h4 className="fw-bold mb-4">Your Illegal Dumping Report</h4>
-        <p className="text-muted">
-          Illegal dumping includes large amounts of garbage and junk left on
-          City of San Jose streets or sidewalks.
-        </p>
-
-        {/* Photo Upload Section */}
-        <div className="mb-3">
-          <label className="fw-bold">
-            Add a Photo<span className="text-danger">*</span>
-          </label>
-          <p className="text-muted" style={{ fontSize: "13px" }}>
-            Help us find it faster. Select any type of image format (Max 10MB
-            each)
-          </p>
+        {/* Stepper */}
+        <div className="d-flex justify-content-center align-items-center mb-4 mt-2">
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              borderRadius: "50%",
+              background: "#198bb3",
+              border: "2px solid #198bb3",
+            }}
+          ></div>
 
           <div
-            className="border rounded d-flex flex-column align-items-center justify-content-center p-4"
             style={{
-              cursor: "pointer",
-              background: "#f8f9fa",
-              border: "2px dashed #ccc",
+              width: "90px",
+              height: "2px",
+              background: "#d9d9d9",
             }}
-            onClick={() => document.getElementById("fileInput")?.click()}
-            // ✅ Allow drag
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+          ></div>
+
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              borderRadius: "50%",
+              background: "#fff",
+              border: "2px solid #d9d9d9",
             }}
-            // ✅ Handle drop
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+          ></div>
 
-              const files = e.dataTransfer.files;
-
-              if (!files || files.length === 0) return;
-
-              handleDroppedFiles(files);
+          <div
+            style={{
+              width: "90px",
+              height: "2px",
+              background: "#d9d9d9",
             }}
-          >
-            <div style={{ fontSize: "24px" }}>📷</div>
-            <p className="mb-0">Drag file here or</p>
-            <span className="text-primary">choose from folder</span>
-          </div>
+          ></div>
+
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              borderRadius: "50%",
+              background: "#fff",
+              border: "2px solid #d9d9d9",
+            }}
+          ></div>
+        </div>
+        {/* Header */}
+        <h4 className="fw-bold mb-4">My Illegal Fireworks Report</h4>
+
+        {/* Date */}
+        <div className="mb-3">
+          <label className="fw-bold">
+            Date of fireworks incident
+            <span className="text-danger">*</span>
+          </label>
 
           <input
-            id="fileInput"
-            type="file"
-            multiple
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleImageUpload}
+            type="date"
+            className="form-control"
+            value={incidentDate}
+            onChange={(e) => setIncidentDate(e.target.value)}
           />
-
-          {imageError && <p className="text-danger mt-2">{imageError}</p>}
-
-          {/* Preview */}
-          {images.length > 0 && (
-            <div className="mt-3 d-flex flex-wrap gap-2">
-              {images.map((img, index) => (
-                <div
-                  key={index}
-                  style={{
-                    position: "relative",
-                    width: "80px",
-                    height: "80px",
-                  }}
-                >
-                  <img
-                    src={URL.createObjectURL(img)}
-                    alt="preview"
-                    width={80}
-                    height={80}
-                    style={{
-                      objectFit: "cover",
-                      borderRadius: "6px",
-                    }}
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setImages((prev) => prev.filter((_, i) => i !== index))
-                    }
-                    className="new-button"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
+
+        {/* Time */}
+        <div className="mb-3">
+          <label className="fw-bold">
+            Time of fireworks incident
+            <span className="text-danger">*</span>
+          </label>
+
+          <select
+            className="form-control"
+            value={incidentTime}
+            onChange={(e) => setIncidentTime(e.target.value)}
+          >
+            <option value="">Select an option</option>
+            <option>Morning</option>
+            <option>Afternoon</option>
+            <option>Evening</option>
+            <option>Night</option>
+          </select>
+        </div>
+
+        {/* Location */}
+        <div className="mb-3">
+          <label className="fw-bold">
+            Location of fireworks incident
+            <span className="text-danger">*</span>
+          </label>
+
+          <select
+            className="form-control"
+            value={incidentLocation}
+            onChange={(e) => setIncidentLocation(e.target.value)}
+          >
+            <option value="">Select an option</option>
+            <option>Front Yard</option>
+            <option>Back Yard</option>
+            <option>Street</option>
+            <option>Park</option>
+            <option>Parking Lot</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        {/* Address Info */}
+        <div className="mb-2"></div>
 
         {/* Address Section */}
         <div className="mb-3">
           <label className="fw-bold">
-            Where is it? <span className="text-danger">*</span>
+            Please provide the address where the use, sale, or possession of
+            fireworks occurred (Only San José addresses are enforceable)
+            <span className="text-danger">*</span>
           </label>
 
-          <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
-            (Only valid city locations are accepted)
+          <p className="text-danger mb-2" style={{ fontSize: "13px" }}>
+            The address provided will be used for enforcement.
           </p>
+
+          <ul style={{ fontSize: "14px" }}>
+            <li>Type in the full address and click search</li>
+            <li>
+              or drag the red pin on the map below to select the location and
+              then click search.
+            </li>
+          </ul>
 
           <input
             type="text"
@@ -353,7 +328,7 @@ const IllegalDumping = () => {
         {/* Additional Info */}
         <div className="mb-3">
           <label className="fw-semibold">
-            Tell us more<span className="text-danger">*</span>
+            Briefly describe the incident. (what you observed)
           </label>
           <textarea
             className="form-control"
@@ -384,7 +359,7 @@ const IllegalDumping = () => {
           <p
             className={`mt-1 ${
               data.additionalInfo.length === 4000 ? "text-danger" : "text-muted"
-            }`}
+            } `}
             style={{ fontSize: "12px" }}
           >
             {data.additionalInfo.length}/4000 characters
@@ -393,53 +368,6 @@ const IllegalDumping = () => {
           {errors.additionalInfo && (
             <p className="text-danger mb-1">{errors.additionalInfo}</p>
           )}
-        </div>
-
-        <div className="mb-3">
-          <label className="fw-bold">
-            Allow public to view your report?
-            <span className="text-danger">*</span>
-          </label>
-          <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
-            No one will see your name
-          </p>
-
-          <div className="mt-2">
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="isView"
-                checked={data.isView === "yes"}
-                onChange={() => {
-                  setData({ ...data, isView: "yes" });
-                  setErrors((prev: any) => ({
-                    ...prev,
-                    whereIsIt: "",
-                  }));
-                }}
-              />
-              <label className="form-check-label">Yes</label>
-            </div>
-
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="offensive"
-                checked={data.isView === "no"}
-                onChange={() => {
-                  setData({ ...data, isView: "no" });
-                  setErrors((prev: any) => ({
-                    ...prev,
-                    isView: "",
-                  }));
-                }}
-              />
-              <label className="form-check-label">No</label>
-            </div>
-          </div>
-          {errors.whereIsIt && <p className="text-danger">{errors.isView}</p>}
         </div>
 
         <button className="next-btn w-100" onClick={handleSubmit}>
@@ -459,4 +387,4 @@ const IllegalDumping = () => {
   );
 };
 
-export default IllegalDumping;
+export default IllegalFirework;

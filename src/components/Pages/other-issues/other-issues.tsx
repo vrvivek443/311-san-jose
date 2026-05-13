@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
-import "./graffiti.css";
 import Modal from "../../shared/modal/modal";
+import "./other-issues.css";
 
-const Graffiti = () => {
+const OtherIssues = () => {
   const navigate = useNavigate();
   const [images, setImages] = useState<File[]>([]);
   const [imageError, setImageError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const [data, setData] = useState({
     address: "",
@@ -23,7 +24,6 @@ const Graffiti = () => {
 
   const [errors, setErrors] = useState<any>({});
   const [showSuccess, setShowSuccess] = useState(false);
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const handleDroppedFiles = (files: FileList) => {
     let selectedFiles = Array.from(files);
 
@@ -84,16 +84,32 @@ const Graffiti = () => {
 
   const validate = () => {
     let newErrors: any = {};
+    let isValid = true;
 
-    if (!data.address) newErrors.address = "Address is required";
-    if (!data.graffitiOn) newErrors.graffitiOn = "Please select an option";
-    if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
-      newErrors.additionalInfo = "Additional Information is required";
+    // Address validation
+    if (!data.address) {
+      newErrors.address =
+        "Please provide a location and remember to hit Search";
+      isValid = false;
     }
-    if (!data.isView) newErrors.isView = "Please select an option";
+
+    // Public view validation
+    if (!data.isView) {
+      newErrors.isView = "Please select an option";
+      isValid = false;
+    }
+
+    // Additional info validation
+    if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
+      newErrors.additionalInfo = "Please describe the issue";
+      isValid = false;
+    }
+
+    // Image validation
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    return isValid;
   };
 
   const handleSubmit = () => {
@@ -105,8 +121,6 @@ const Graffiti = () => {
       console.log("Graffiti Data:", data);
 
       setIsSubmitting(false);
-
-      // ✅ Show feedback modal after loader
       setShowFeedbackModal(true);
       setShowSuccess(true);
     }, 1000);
@@ -115,15 +129,17 @@ const Graffiti = () => {
   if (showSuccess) {
     return (
       <>
-        <h4 className="fw-bold mb-4">Your Graffiti Report</h4>
+        <h4 className="fw-bold mb-4">Thank you for your report, Vivek Vr!</h4>
+
         <AlertNavigation
           description={[
-            "Write down your reference ID: 260504-001201. Use it to track the status of your report.",
-            "Graffiti is abated within 72 hours being reported. However, due to location, weather or surface, abatement times may vary. Gang and Offensive graffiti is removed within 1 business day. In order to have gang/offensive graffiti elevated, residents should call the graffiti program directly at (408) 975-7233.",
+            "Your reference ID# is 260507-000018.",
+            "We'll also email you a confirmation.",
+            "The RAPID (Removing and Preventing Illegal Dumping) team will respond to reports of illegal dumping within 5 business days.",
           ]}
           primaryText="Track my report"
-          secondaryText="Return home"
           onPrimary={() => navigate("/track-report")}
+          secondaryText="Return home"
           onSecondary={() => navigate("/")}
         />
       </>
@@ -188,14 +204,16 @@ const Graffiti = () => {
       </Modal>
       <div className="container mt-3 mb-4">
         {/* Header */}
-        <h4 className="fw-bold mb-4">Your Graffiti Report</h4>
+        <h4 className="fw-bold mb-4">Your Report</h4>
         <p className="text-muted">
-          Report graffiti on buildings, sidewalks, roads and structures.
+          This is for reporting and finding information about all other issues. Report concerns on private property here. Call 911 for emergencies.
         </p>
 
         {/* Photo Upload Section */}
         <div className="mb-3">
-          <label className="fw-bold">Add a Photo</label>
+          <label className="fw-bold">
+            Add a Photo
+          </label>
           <p className="text-muted" style={{ fontSize: "13px" }}>
             Help us find it faster. Select any type of image format (Max 10MB
             each)
@@ -240,6 +258,8 @@ const Graffiti = () => {
             onChange={handleImageUpload}
           />
 
+          {imageError && <p className="text-danger mt-2">{imageError}</p>}
+
           {/* Preview */}
           {images.length > 0 && (
             <div className="mt-3 d-flex flex-wrap gap-2">
@@ -278,8 +298,6 @@ const Graffiti = () => {
           )}
         </div>
 
-        {imageError && <p className="text-danger">{imageError}</p>}
-
         {/* Address Section */}
         <div className="mb-3">
           <label className="fw-bold">
@@ -300,6 +318,7 @@ const Graffiti = () => {
               setErrors((prev: any) => ({ ...prev, address: "" }));
             }}
           />
+
           {errors.address && <p className="text-danger">{errors.address}</p>}
 
           <button className="next-btn mb-3 search-btn">
@@ -322,93 +341,6 @@ const Graffiti = () => {
               />
             </GoogleMap>
           </LoadScript>
-        </div>
-
-        {/* Graffiti On */}
-        <div className="mb-3">
-          <label className="fw-bold">
-            What is it on? <span className="text-danger">*</span>
-          </label>
-
-          <select
-            className="form-control"
-            value={data.graffitiOn}
-            onChange={(e) => {
-              setData({ ...data, graffitiOn: e.target.value });
-              setErrors((prev: any) => ({
-                ...prev,
-                graffitiOn: "",
-              }));
-            }}
-          >
-            <option value="">Select</option>
-            <option>Building</option>
-            <option>Sidewalk</option>
-            <option>Road</option>
-            <option>Other</option>
-          </select>
-
-          {errors.graffitiOn && (
-            <p className="text-danger">{errors.graffitiOn}</p>
-          )}
-        </div>
-
-        {/* Public Property */}
-        <div className="mb-3">
-          <label className="fw-bold">Is it on public property?</label>
-
-          <div className="mt-2">
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="public"
-                checked={data.isPublic === "yes"}
-                onChange={() => setData({ ...data, isPublic: "yes" })}
-              />
-              <label className="form-check-label">Yes</label>
-            </div>
-
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="public"
-                checked={data.isPublic === "no"}
-                onChange={() => setData({ ...data, isPublic: "no" })}
-              />
-              <label className="form-check-label">No</label>
-            </div>
-          </div>
-        </div>
-
-        {/* Offensive */}
-        <div className="mb-3">
-          <label className="fw-bold">Is it offensive?</label>
-
-          <div className="mt-2">
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="offensive"
-                checked={data.isOffensive === "yes"}
-                onChange={() => setData({ ...data, isOffensive: "yes" })}
-              />
-              <label className="form-check-label">Yes</label>
-            </div>
-
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="offensive"
-                checked={data.isOffensive === "no"}
-                onChange={() => setData({ ...data, isOffensive: "no" })}
-              />
-              <label className="form-check-label">No</label>
-            </div>
-          </div>
         </div>
 
         {/* Additional Info */}
@@ -456,52 +388,6 @@ const Graffiti = () => {
           )}
         </div>
 
-        <div className="mb-3">
-          <label className="fw-bold">
-            Allow public to view your report?
-            <span className="text-danger">*</span>
-          </label>
-          <p className="text-muted mb-1" style={{ fontSize: "13px" }}>
-            No one will see your name
-          </p>
-
-          <div className="mt-2">
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="isView"
-                checked={data.isView === "yes"}
-                onChange={() => {
-                  setData({ ...data, isView: "yes" });
-                  setErrors((prev: any) => ({
-                    ...prev,
-                    isView: "",
-                  }));
-                }}
-              />
-              <label className="form-check-label">Yes</label>
-            </div>
-
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="offensive"
-                checked={data.isView === "no"}
-                onChange={() => {
-                  setData({ ...data, isView: "no" });
-                  setErrors((prev: any) => ({
-                    ...prev,
-                    isView: "",
-                  }));
-                }}
-              />
-              <label className="form-check-label">No</label>
-            </div>
-          </div>
-          {errors.isView && <p className="text-danger">{errors.isView}</p>}
-        </div>
 
         {/* Submit */}
         <button className="next-btn w-100" onClick={handleSubmit}>
@@ -521,5 +407,4 @@ const Graffiti = () => {
   );
 };
 
-export default Graffiti;
-//Grafitti-New-Change
+export default OtherIssues;
