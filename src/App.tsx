@@ -149,7 +149,7 @@ function App() {
             <Route path="/other-issues" element={<OtherIssues />} />
             <Route path="/illegal-fireworks" element={<IllegalFirework />} />
             <Route path="/community-wifi" element={<CommunityWifi />} />
-            <Route path="/sewage-issues" element={<SewageIssues />} />
+            <Route path="/sewer-issues" element={<SewageIssues />} />
           </Routes>
 
         </div>

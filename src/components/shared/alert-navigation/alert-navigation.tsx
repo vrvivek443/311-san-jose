@@ -27,17 +27,15 @@ const AlertNavigation: React.FC<AlertNavigationProps> = ({
         ))}
 
         {/* Optional Links */}
-        {links && (
-          <ul>
-            {links.map((link, i) => (
-              <li key={i}>
-                <a href={link.url || "#"} target="_blank" rel="noreferrer">
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
+{links && (
+  <ul>
+    {links.map((link, i) => (
+      <li key={i}>
+        {link.label}
+      </li>
+    ))}
+  </ul>
+)}
 
         {/* Buttons */}
         <div className="mt-4">
