@@ -53,52 +53,52 @@ const SectionTwo = forwardRef<SectionTwoRef, SectionTwoProps>(
     const hasImages = images && images.length > 0;
 
     const handleAddImages = (files: FileList | null) => {
-  if (!files) return;
+      if (!files) return;
 
-  const maxSize = 10 * 1024 * 1024; // 10MB
+      const maxSize = 10 * 1024 * 1024; // 10MB
 
-  const validFiles: File[] = [];
-  let hasSizeError = false;
-  let hasTypeError = false;
+      const validFiles: File[] = [];
+      let hasSizeError = false;
+      let hasTypeError = false;
 
-  Array.from(files).forEach((file) => {
-    // ✅ Allow only images
-    if (!file.type.startsWith("image/")) {
-      hasTypeError = true;
-      return;
-    }
+      Array.from(files).forEach((file) => {
+        // ✅ Allow only images
+        if (!file.type.startsWith("image/")) {
+          hasTypeError = true;
+          return;
+        }
 
-    // ✅ File size validation
-    if (file.size > maxSize) {
-      hasSizeError = true;
-      return;
-    }
+        // ✅ File size validation
+        if (file.size > maxSize) {
+          hasSizeError = true;
+          return;
+        }
 
-    validFiles.push(file);
-  });
+        validFiles.push(file);
+      });
 
-  // ✅ Error handling
-  if (hasTypeError) {
-    setError("Only image files are allowed");
-    return;
-  }
+      // ✅ Error handling
+      if (hasTypeError) {
+        setError("Only image files are allowed");
+        return;
+      }
 
-  if (hasSizeError) {
-    setError("Each file must be less than 10 MB");
-    return;
-  }
+      if (hasSizeError) {
+        setError("Each file must be less than 10 MB");
+        return;
+      }
 
-  // ✅ Save valid images
-  if (validFiles.length > 0) {
-    onChange({
-      ...data,
-      images: [...images, ...validFiles],
-      noPhoto: false,
-    });
+      // ✅ Save valid images
+      if (validFiles.length > 0) {
+        onChange({
+          ...data,
+          images: [...images, ...validFiles],
+          noPhoto: false,
+        });
 
-    setError("");
-  }
-};
+        setError("");
+      }
+    };
     const handleRemoveImage = (index: number) => {
       const updated = images.filter((_, i) => i !== index);
       onChange({

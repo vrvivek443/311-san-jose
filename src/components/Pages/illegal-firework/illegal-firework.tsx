@@ -3,6 +3,8 @@ import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
 import Modal from "../../shared/modal/modal";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const IllegalFirework = () => {
   const navigate = useNavigate();
@@ -38,10 +40,27 @@ const IllegalFirework = () => {
     setData({ ...data, position: { lat, lng } });
   };
 
-
   const validate = () => {
     let newErrors: any = {};
     let isValid = true;
+
+    // Date validation
+    if (!incidentDate) {
+      newErrors.incidentDate = "Please select the incident date";
+      isValid = false;
+    }
+
+    // Time validation
+    if (!incidentTime) {
+      newErrors.incidentTime = "Please select the incident time";
+      isValid = false;
+    }
+
+    // Location validation
+    if (!incidentLocation) {
+      newErrors.incidentLocation = "Please select the incident location";
+      isValid = false;
+    }
 
     // Address validation
     if (!data.address) {
@@ -50,18 +69,7 @@ const IllegalFirework = () => {
       isValid = false;
     }
 
-    // Public view validation
-    if (!data.isView) {
-      newErrors.isView = "Please select an option";
-      isValid = false;
-    }
-
-    // Additional info validation
-    if (!data.additionalInfo || data.additionalInfo.trim().length === 0) {
-      newErrors.additionalInfo = "Please describe the issue";
-      isValid = false;
-    }
-
+    // Description validation
 
     setErrors(newErrors);
 
@@ -213,29 +221,51 @@ const IllegalFirework = () => {
         {/* Date */}
         <div className="mb-3">
           <label className="fw-bold">
-            Date of fireworks incident
+            Date of fireworks incident{" "}
             <span className="text-danger">*</span>
           </label>
 
-          <input
-            type="date"
-            className="form-control"
-            value={incidentDate}
-            onChange={(e) => setIncidentDate(e.target.value)}
-          />
+          <DatePicker
+  selected={incidentDate ? new Date(incidentDate) : null}
+  onChange={(date: Date | null) => {
+    if (date) {
+      setIncidentDate(date.toISOString());
+      
+      setErrors((prev: any) => ({
+        ...prev,
+        incidentDate: "",
+      }));
+    }
+  }}
+  dateFormat="MM/dd/yyyy"
+  placeholderText="mm/dd/yyyy"
+  className="form-control"
+  wrapperClassName="w-100"
+/>
+
+{errors.incidentDate && (
+  <p className="text-danger mb-1">{errors.incidentDate}</p>
+)}
         </div>
 
         {/* Time */}
         <div className="mb-3">
           <label className="fw-bold">
-            Time of fireworks incident
+            Time of fireworks incident{" "}
             <span className="text-danger">*</span>
           </label>
 
           <select
             className="form-control"
             value={incidentTime}
-            onChange={(e) => setIncidentTime(e.target.value)}
+            onChange={(e) => {
+              setIncidentTime(e.target.value);
+
+              setErrors((prev: any) => ({
+                ...prev,
+                incidentTime: "",
+              }));
+            }}
           >
             <option value="">Select an option</option>
             <option>Morning</option>
@@ -243,19 +273,30 @@ const IllegalFirework = () => {
             <option>Evening</option>
             <option>Night</option>
           </select>
+
+          {errors.incidentTime && (
+            <p className="text-danger mb-1">{errors.incidentTime}</p>
+          )}
         </div>
 
         {/* Location */}
         <div className="mb-3">
           <label className="fw-bold">
-            Location of fireworks incident
+            Location of fireworks incident{" "}
             <span className="text-danger">*</span>
           </label>
 
           <select
             className="form-control"
             value={incidentLocation}
-            onChange={(e) => setIncidentLocation(e.target.value)}
+            onChange={(e) => {
+              setIncidentLocation(e.target.value);
+
+              setErrors((prev: any) => ({
+                ...prev,
+                incidentLocation: "",
+              }));
+            }}
           >
             <option value="">Select an option</option>
             <option>Front Yard</option>
@@ -265,6 +306,10 @@ const IllegalFirework = () => {
             <option>Parking Lot</option>
             <option>Other</option>
           </select>
+
+          {errors.incidentLocation && (
+            <p className="text-danger mb-1">{errors.incidentLocation}</p>
+          )}
         </div>
 
         {/* Address Info */}
@@ -365,9 +410,6 @@ const IllegalFirework = () => {
             {data.additionalInfo.length}/4000 characters
           </p>
 
-          {errors.additionalInfo && (
-            <p className="text-danger mb-1">{errors.additionalInfo}</p>
-          )}
         </div>
 
         <button className="next-btn w-100" onClick={handleSubmit}>

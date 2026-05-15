@@ -66,8 +66,16 @@ const reportItems = [
 ];
 
 const lookingitems = [
-  { img: payutility, label: "Pay Utility Bills" },
-  { img: rentregistry, label: "Rent Registry Tenant Portal" },
+  {
+    img: payutility,
+    label: "Pay Utility Bills",
+    path: "/pay-utility-bills",
+  },
+  {
+    img: rentregistry,
+    label: "Rent Registry Tenant Portal",
+    path: "https://sjhousingloans.my.site.com/s/tenantportalpage?language=en_US",
+  },
   { img: eviction, label: "Eviction Prevention" },
   { img: affordablehousing, label: "Affordable Housing" },
   { img: streetsweeping, label: "Street Sweeping" },
@@ -126,6 +134,8 @@ const Home = () => {
                   setShowModal(true);
                 } else if (item.path === "/streetlight-outage") {
                   navigate("/streetlight-warning");
+                } else if (item.path === "/community-wifi") {
+                  navigate("/community-wifi-warning");
                 } else {
                   item.path && navigate(item.path);
                 }
@@ -151,14 +161,30 @@ const Home = () => {
         onSecondary={modalData?.onSecondary || (() => {})}
       />
       {/* Looking for section */}
+      {/* Looking for section */}
       <div className="dashboard">
         <h3 className="section-title">Looking for</h3>
+
         <div className="tile-grid">
           {lookingitems.map((item, index) => (
-            <div className="tile" key={index}>
+            <div
+              className="tile"
+              key={index}
+              onClick={() => {
+                if (item.path) {
+                  if (item.path.startsWith("http")) {
+                    window.open(item.path, "_blank");
+                  } else {
+                    navigate(item.path);
+                  }
+                }
+              }}
+              style={{ cursor: item.path ? "pointer" : "default" }}
+            >
               <div className="tile-icon">
                 <img src={item.img} alt={item.label} />
               </div>
+
               <p className="tile-label">{item.label}</p>
             </div>
           ))}

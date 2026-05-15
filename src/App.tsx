@@ -15,6 +15,8 @@ import IllegalFirework from "./components/Pages/illegal-firework/illegal-firewor
 import CommunityWifi from "./components/Pages/community-wifi/community-wifi";
 import SewageIssues from "./components/Pages/sewage-issues/sewage-issues";
 import StreetlightWarning from "./components/Pages/streetlight-outage/streelight-warning-alert";
+import CommunityWifiWarning from "./components/Pages/community-wifi/community-wifi-warning";
+import PayUtilityBills from "./components/Pages/Pay-Utility-Bills/pay-utility-bills";
 
 function App() {
   const navigate = useNavigate();
@@ -150,6 +152,8 @@ function App() {
             <Route path="/illegal-fireworks" element={<IllegalFirework />} />
             <Route path="/community-wifi" element={<CommunityWifi />} />
             <Route path="/sewer-issues" element={<SewageIssues />} />
+            <Route path="/community-wifi-warning" element={<CommunityWifiWarning />} />
+            <Route path="/pay-utility-bills" element={<PayUtilityBills />} />
           </Routes>
 
         </div>

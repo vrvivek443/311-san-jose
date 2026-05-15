@@ -27,28 +27,29 @@ const AlertNavigation: React.FC<AlertNavigationProps> = ({
         ))}
 
         {/* Optional Links */}
-{links && (
-  <ul>
-    {links.map((link, i) => (
-      <li key={i}>
-        {link.label}
-      </li>
-    ))}
-  </ul>
-)}
+        {links && (
+          <ul>
+            {links.map((link, i) => (
+              <li key={i}>{link.label}</li>
+            ))}
+          </ul>
+        )}
 
+        {/* Buttons */}
         {/* Buttons */}
         <div className="mt-4">
           <button className="btn btn-color w-100 mb-2" onClick={onPrimary}>
             {primaryText}
           </button>
 
-          <button
-            className="btn btn-outline-secondary w-100"
-            onClick={onSecondary}
-          >
-            {secondaryText}
-          </button>
+          {secondaryText && (
+            <button
+              className="btn btn-outline-secondary w-100"
+              onClick={onSecondary}
+            >
+              {secondaryText}
+            </button>
+          )}
         </div>
       </div>
     </div>
