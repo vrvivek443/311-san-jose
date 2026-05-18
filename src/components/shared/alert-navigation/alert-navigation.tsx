@@ -2,8 +2,8 @@ import React from "react";
 
 interface AlertNavigationProps {
   title?: string;
-  description: string[];
-  links?: { label: string; url?: string }[];
+  description: React.ReactNode[];
+  links?: { label: React.ReactNode; url?: string }[];
   primaryText: string;
   secondaryText: string;
   onPrimary: () => void;

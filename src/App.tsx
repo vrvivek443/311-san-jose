@@ -13,7 +13,7 @@ import StreetlightOutage from "./components/Pages/streetlight-outage/streetlight
 import OtherIssues from "./components/Pages/other-issues/other-issues";
 import IllegalFirework from "./components/Pages/illegal-firework/illegal-firework";
 import CommunityWifi from "./components/Pages/community-wifi/community-wifi";
-import SewageIssues from "./components/Pages/sewage-issues/sewage-issues";
+import SewageIssues from "./components/Pages/sewer-issues/sewer-issues";
 import StreetlightWarning from "./components/Pages/streetlight-outage/streelight-warning-alert";
 import CommunityWifiWarning from "./components/Pages/community-wifi/community-wifi-warning";
 import PayUtilityBills from "./components/Pages/Pay-Utility-Bills/pay-utility-bills";

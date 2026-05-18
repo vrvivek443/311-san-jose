@@ -177,7 +177,7 @@ const CommunityWifi = () => {
           <select
             className="form-select"
             value={data.area}
-            onChange={(e) => setData({ ...data, area: e.target.value })}
+            onChange={(e) => { setData({ ...data, area: e.target.value }); setErrors((prev: any) => ({ ...prev, area: "" })); }}
           >
             <option value="">Select an option</option>
             <option>Andrew Hill High School attendance area</option>
@@ -226,9 +226,7 @@ const CommunityWifi = () => {
             <select
               className="form-select"
               value={data.wifiConnected}
-              onChange={(e) =>
-                setData({ ...data, wifiConnected: e.target.value })
-              }
+              onChange={(e) => { setData({ ...data, wifiConnected: e.target.value }); setErrors((prev: any) => ({ ...prev, wifiConnected: "" })); }}
             >
               <option value="">Select an option</option>
               <option>Yes</option>
@@ -250,9 +248,7 @@ const CommunityWifi = () => {
             <select
               className="form-select"
               value={data.experienceTime}
-              onChange={(e) =>
-                setData({ ...data, experienceTime: e.target.value })
-              }
+              onChange={(e) => { setData({ ...data, experienceTime: e.target.value }); setErrors((prev: any) => ({ ...prev, experienceTime: "" })); }}
             >
               <option value="">Select an option</option>
               <option>Today</option>
@@ -275,9 +271,7 @@ const CommunityWifi = () => {
             <select
               className="form-select"
               value={data.wifiLocation}
-              onChange={(e) =>
-                setData({ ...data, wifiLocation: e.target.value })
-              }
+              onChange={(e) => { setData({ ...data, wifiLocation: e.target.value }); setErrors((prev: any) => ({ ...prev, wifiLocation: "" })); }}
             >
               <option value="">Select an option</option>
               <option>Library</option>
@@ -301,7 +295,7 @@ const CommunityWifi = () => {
             <select
               className="form-select"
               value={data.deviceType}
-              onChange={(e) => setData({ ...data, deviceType: e.target.value })}
+              onChange={(e) => { setData({ ...data, deviceType: e.target.value }); setErrors((prev: any) => ({ ...prev, deviceType: "" })); }}
             >
               <option value="">Select an option</option>
               <option>Android</option>
@@ -325,9 +319,7 @@ const CommunityWifi = () => {
             <select
               className="form-select"
               value={data.experienceRating}
-              onChange={(e) =>
-                setData({ ...data, experienceRating: e.target.value })
-              }
+              onChange={(e) => { setData({ ...data, experienceRating: e.target.value }); setErrors((prev: any) => ({ ...prev, experienceRating: "" })); }}
             >
               <option value="">Select an option</option>
               <option>Excellent</option>
