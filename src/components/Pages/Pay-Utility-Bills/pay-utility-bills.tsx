@@ -82,6 +82,7 @@ const PayUtilityBills = () => {
             ),
           },
         ]}
+        descriptionBelow
         primaryText="Go To E-Bill Express now!"
         secondaryText=""
         onPrimary={() => {

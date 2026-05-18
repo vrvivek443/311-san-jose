@@ -8,6 +8,7 @@ interface AlertNavigationProps {
   secondaryText: string;
   onPrimary: () => void;
   onSecondary: () => void;
+  descriptionBelow?: boolean;
 }
 
 const AlertNavigation: React.FC<AlertNavigationProps> = ({
@@ -17,23 +18,26 @@ const AlertNavigation: React.FC<AlertNavigationProps> = ({
   secondaryText,
   onPrimary,
   onSecondary,
+  descriptionBelow = false,
 }) => {
+  const descriptionBlock = description.map((text, i) => (
+    <p key={i}>{text}</p>
+  ));
+
+  const linksBlock = links && (
+    <ul>
+      {links.map((link, i) => (
+        <li key={i}>{link.label}</li>
+      ))}
+    </ul>
+  );
+
   return (
     <div className="container mt-4">
       <div className="card p-4 shadow-sm">
-        {/* Content */}
-        {description.map((text, i) => (
-          <p key={i}>{text}</p>
-        ))}
-
-        {/* Optional Links */}
-        {links && (
-          <ul>
-            {links.map((link, i) => (
-              <li key={i}>{link.label}</li>
-            ))}
-          </ul>
-        )}
+        {!descriptionBelow && descriptionBlock}
+        {linksBlock}
+        {descriptionBelow && descriptionBlock}
 
         {/* Buttons */}
         {/* Buttons */}
