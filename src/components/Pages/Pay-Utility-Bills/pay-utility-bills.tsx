@@ -30,7 +30,7 @@ const PayUtilityBills = () => {
             The City of San José has changed the billing method for single-family
             residential garbage services. Charges are now placed on the{" "}
             <a
-              href="https://www.sccgov.org/sites/scc/Pages/property-taxes.aspx"
+              href="https://dtac.santaclaracounty.gov/home"
               target="_blank"
               rel="noreferrer"
             >
