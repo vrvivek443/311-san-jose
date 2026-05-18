@@ -5,6 +5,9 @@ import Modal from "../../shared/modal/modal";
 import SectionOne from "./sections/sections-one";
 import type { SectionOneData } from "./sections/sections-one";
 import SectionTwo from "./sections/sections-two";
+import type { SectionTwoData } from "./sections/sections-two";
+import SectionThree from "./sections/sections-three";
+import type { SectionThreeData } from "./sections/sections-three";
 
 const TOTAL_STEPS = 3;
 
@@ -22,6 +25,24 @@ const IllegalFirework = () => {
     address: "",
     additionalInfo: "",
     position: { lat: 37.3382, lng: -121.8863 },
+  });
+
+  const [sectionTwoData, setSectionTwoData] = useState<SectionTwoData>({
+    knowWho: "",
+    name1: "",
+    name2: "",
+    hasEvidence: "",
+    files: [],
+  });
+
+  const [sectionThreeData, setSectionThreeData] = useState<SectionThreeData>({
+    name: "",
+    fullAddress: "",
+    phone: "",
+    email: "",
+    ack1: false,
+    ack2: false,
+    ack3: false,
   });
 
   const handleSubmit = () => {
@@ -151,25 +172,19 @@ const IllegalFirework = () => {
         )}
         {step === 2 && (
           <SectionTwo
+            data={sectionTwoData}
+            onChange={setSectionTwoData}
             onBack={() => setStep(1)}
             onNext={() => setStep(3)}
           />
         )}
         {step === 3 && (
-          <div>
-            <p className="text-muted">Section Three — coming soon.</p>
-            <div className="d-flex gap-2 mt-3">
-              <button
-                className="btn btn-outline-secondary w-50"
-                onClick={() => setStep(2)}
-              >
-                Back
-              </button>
-              <button className="next-btn w-50" onClick={handleSubmit}>
-                Submit
-              </button>
-            </div>
-          </div>
+          <SectionThree
+            data={sectionThreeData}
+            onChange={setSectionThreeData}
+            onBack={() => setStep(2)}
+            onNext={handleSubmit}
+          />
         )}
 
         {isSubmitting && (
