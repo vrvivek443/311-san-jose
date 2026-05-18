@@ -1,89 +1,32 @@
 import React, { useState } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useNavigate } from "react-router-dom";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
 import Modal from "../../shared/modal/modal";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import SectionOne from "./sections/sections-one";
+import type { SectionOneData } from "./sections/sections-one";
+import SectionTwo from "./sections/sections-two";
+
+const TOTAL_STEPS = 3;
 
 const IllegalFirework = () => {
   const navigate = useNavigate();
-  const [images, setImages] = useState<File[]>([]);
+  const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [incidentDate, setIncidentDate] = useState("");
-  const [incidentTime, setIncidentTime] = useState("");
-  const [incidentLocation, setIncidentLocation] = useState("");
-
-  const [data, setData] = useState({
-    address: "",
-    additionalInfo: "",
-    graffitiOn: "",
-    isPublic: "",
-    isOffensive: "",
-    isView: "no",
-    position: { lat: 37.3382, lng: -121.8863 }, // San Jose default
-  });
-
-  const [errors, setErrors] = useState<any>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const containerStyle = {
-    width: "100%",
-    height: "300px",
-  };
-
-  const handleDragEnd = (e: any) => {
-    const lat = e.latLng.lat();
-    const lng = e.latLng.lng();
-
-    setData({ ...data, position: { lat, lng } });
-  };
-
-  const validate = () => {
-    let newErrors: any = {};
-    let isValid = true;
-
-    // Date validation
-    if (!incidentDate) {
-      newErrors.incidentDate = "Please select the incident date";
-      isValid = false;
-    }
-
-    // Time validation
-    if (!incidentTime) {
-      newErrors.incidentTime = "Please select the incident time";
-      isValid = false;
-    }
-
-    // Location validation
-    if (!incidentLocation) {
-      newErrors.incidentLocation = "Please select the incident location";
-      isValid = false;
-    }
-
-    // Address validation
-    if (!data.address) {
-      newErrors.address =
-        "Please provide a location and remember to hit Search";
-      isValid = false;
-    }
-
-    // Description validation
-
-    setErrors(newErrors);
-
-    return isValid;
-  };
+  const [sectionOneData, setSectionOneData] = useState<SectionOneData>({
+    incidentDate: "",
+    incidentTime: "",
+    incidentLocation: "",
+    address: "",
+    additionalInfo: "",
+    position: { lat: 37.3382, lng: -121.8863 },
+  });
 
   const handleSubmit = () => {
-    if (!validate()) return;
-
     setIsSubmitting(true);
-
     setTimeout(() => {
-      console.log("Graffiti Data:", data);
-
       setIsSubmitting(false);
       setShowFeedbackModal(true);
       setShowSuccess(true);
@@ -109,6 +52,7 @@ const IllegalFirework = () => {
       </>
     );
   }
+
   return (
     <>
       <Modal
@@ -118,7 +62,6 @@ const IllegalFirework = () => {
         <div className="text-start">
           <h5 className="fw-bold mb-3">Please share your Feedback</h5>
 
-          {/* Question 1 */}
           <p className="fw-semibold">
             How would you rate your overall experience using San Jose 311 to
             enter a service request?
@@ -132,7 +75,6 @@ const IllegalFirework = () => {
             </div>
           ))}
 
-          {/* Question 2 */}
           <p className="fw-semibold mt-3">
             How did you hear about San Jose 311?
             <span className="text-danger">*</span>
@@ -155,7 +97,6 @@ const IllegalFirework = () => {
             </div>
           ))}
 
-          {/* Submit Button */}
           <div className="text-end mt-3">
             <button
               className="btn btn-info text-white"
@@ -166,255 +107,70 @@ const IllegalFirework = () => {
           </div>
         </div>
       </Modal>
+
       <div className="container mt-3 mb-4">
         {/* Stepper */}
         <div className="d-flex justify-content-center align-items-center mb-4 mt-2">
-          <div
-            style={{
-              width: "18px",
-              height: "18px",
-              borderRadius: "50%",
-              background: "#198bb3",
-              border: "2px solid #198bb3",
-            }}
-          ></div>
-
-          <div
-            style={{
-              width: "90px",
-              height: "2px",
-              background: "#d9d9d9",
-            }}
-          ></div>
-
-          <div
-            style={{
-              width: "18px",
-              height: "18px",
-              borderRadius: "50%",
-              background: "#fff",
-              border: "2px solid #d9d9d9",
-            }}
-          ></div>
-
-          <div
-            style={{
-              width: "90px",
-              height: "2px",
-              background: "#d9d9d9",
-            }}
-          ></div>
-
-          <div
-            style={{
-              width: "18px",
-              height: "18px",
-              borderRadius: "50%",
-              background: "#fff",
-              border: "2px solid #d9d9d9",
-            }}
-          ></div>
+          {Array.from({ length: TOTAL_STEPS }, (_, i) => {
+            const stepNum = i + 1;
+            const isActive = step >= stepNum;
+            return (
+              <React.Fragment key={stepNum}>
+                <div
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    background: isActive ? "#198bb3" : "#fff",
+                    border: `2px solid ${isActive ? "#198bb3" : "#d9d9d9"}`,
+                  }}
+                />
+                {stepNum < TOTAL_STEPS && (
+                  <div
+                    style={{
+                      width: "90px",
+                      height: "2px",
+                      background: step > stepNum ? "#198bb3" : "#d9d9d9",
+                    }}
+                  />
+                )}
+              </React.Fragment>
+            );
+          })}
         </div>
+
         {/* Header */}
         <h4 className="fw-bold mb-4">My Illegal Fireworks Report</h4>
 
-        {/* Date */}
-        <div className="mb-3">
-          <label className="fw-bold">
-            Date of fireworks incident{" "}
-            <span className="text-danger">*</span>
-          </label>
-
-          <DatePicker
-  selected={incidentDate ? new Date(incidentDate) : null}
-  onChange={(date: Date | null) => {
-    if (date) {
-      setIncidentDate(date.toISOString());
-      
-      setErrors((prev: any) => ({
-        ...prev,
-        incidentDate: "",
-      }));
-    }
-  }}
-  dateFormat="MM/dd/yyyy"
-  placeholderText="mm/dd/yyyy"
-  className="form-control"
-  wrapperClassName="w-100"
-/>
-
-{errors.incidentDate && (
-  <p className="text-danger mb-1">{errors.incidentDate}</p>
-)}
-        </div>
-
-        {/* Time */}
-        <div className="mb-3">
-          <label className="fw-bold">
-            Time of fireworks incident{" "}
-            <span className="text-danger">*</span>
-          </label>
-
-          <select
-            className="form-control"
-            value={incidentTime}
-            onChange={(e) => {
-              setIncidentTime(e.target.value);
-
-              setErrors((prev: any) => ({
-                ...prev,
-                incidentTime: "",
-              }));
-            }}
-          >
-            <option value="">Select an option</option>
-            <option>Morning</option>
-            <option>Afternoon</option>
-            <option>Evening</option>
-            <option>Night</option>
-          </select>
-
-          {errors.incidentTime && (
-            <p className="text-danger mb-1">{errors.incidentTime}</p>
-          )}
-        </div>
-
-        {/* Location */}
-        <div className="mb-3">
-          <label className="fw-bold">
-            Location of fireworks incident{" "}
-            <span className="text-danger">*</span>
-          </label>
-
-          <select
-            className="form-control"
-            value={incidentLocation}
-            onChange={(e) => {
-              setIncidentLocation(e.target.value);
-
-              setErrors((prev: any) => ({
-                ...prev,
-                incidentLocation: "",
-              }));
-            }}
-          >
-            <option value="">Select an option</option>
-            <option>Front Yard</option>
-            <option>Back Yard</option>
-            <option>Street</option>
-            <option>Park</option>
-            <option>Parking Lot</option>
-            <option>Other</option>
-          </select>
-
-          {errors.incidentLocation && (
-            <p className="text-danger mb-1">{errors.incidentLocation}</p>
-          )}
-        </div>
-
-        {/* Address Info */}
-        <div className="mb-2"></div>
-
-        {/* Address Section */}
-        <div className="mb-3">
-          <label className="fw-bold">
-            Please provide the address where the use, sale, or possession of
-            fireworks occurred (Only San José addresses are enforceable)
-            <span className="text-danger">*</span>
-          </label>
-
-          <p className="text-danger mb-2" style={{ fontSize: "13px" }}>
-            The address provided will be used for enforcement.
-          </p>
-
-          <ul style={{ fontSize: "14px" }}>
-            <li>Type in the full address and click search</li>
-            <li>
-              or drag the red pin on the map below to select the location and
-              then click search.
-            </li>
-          </ul>
-
-          <input
-            type="text"
-            className="form-control mb-2"
-            placeholder="Enter address"
-            value={data.address}
-            onChange={(e) => {
-              setData({ ...data, address: e.target.value });
-              setErrors((prev: any) => ({ ...prev, address: "" }));
-            }}
+        {step === 1 && (
+          <SectionOne
+            data={sectionOneData}
+            onChange={setSectionOneData}
+            onNext={() => setStep(2)}
           />
-
-          {errors.address && <p className="text-danger">{errors.address}</p>}
-
-          <button className="next-btn mb-3 search-btn">
-            Search (Optional) 🔍
-          </button>
-        </div>
-
-        {/* Map */}
-        <div className="mb-3">
-          <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
-            <GoogleMap
-              mapContainerStyle={containerStyle}
-              center={data.position}
-              zoom={13}
-            >
-              <Marker
-                position={data.position}
-                draggable
-                onDragEnd={handleDragEnd}
-              />
-            </GoogleMap>
-          </LoadScript>
-        </div>
-
-        {/* Additional Info */}
-        <div className="mb-3">
-          <label className="fw-semibold">
-            Briefly describe the incident. (what you observed)
-          </label>
-          <textarea
-            className="form-control"
-            rows={3}
-            placeholder="Add details here"
-            value={data.additionalInfo}
-            onChange={(e) => {
-              let value = e.target.value;
-
-              // ✅ HARD LIMIT: stop at 4000 chars
-              if (value.length > 4000) return;
-
-              setData({ ...data, additionalInfo: value });
-
-              if (value.trim().length === 0) {
-                setErrors((prev: any) => ({
-                  ...prev,
-                  additionalInfo: "This field is required",
-                }));
-              } else {
-                setErrors((prev: any) => ({
-                  ...prev,
-                  additionalInfo: "",
-                }));
-              }
-            }}
+        )}
+        {step === 2 && (
+          <SectionTwo
+            onBack={() => setStep(1)}
+            onNext={() => setStep(3)}
           />
-          <p
-            className={`mt-1 ${
-              data.additionalInfo.length === 4000 ? "text-danger" : "text-muted"
-            } `}
-            style={{ fontSize: "12px" }}
-          >
-            {data.additionalInfo.length}/4000 characters
-          </p>
-
-        </div>
-
-        <button className="next-btn w-100" onClick={handleSubmit}>
-          Submit
-        </button>
+        )}
+        {step === 3 && (
+          <div>
+            <p className="text-muted">Section Three — coming soon.</p>
+            <div className="d-flex gap-2 mt-3">
+              <button
+                className="btn btn-outline-secondary w-50"
+                onClick={() => setStep(2)}
+              >
+                Back
+              </button>
+              <button className="next-btn w-50" onClick={handleSubmit}>
+                Submit
+              </button>
+            </div>
+          </div>
+        )}
 
         {isSubmitting && (
           <div className="loader-overlay">
