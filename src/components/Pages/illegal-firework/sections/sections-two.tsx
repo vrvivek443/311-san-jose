@@ -26,7 +26,6 @@ const SectionTwo: React.FC<SectionTwoProps> = ({
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const ALLOWED_TYPES = ["image/png", "image/jpeg", "video/mp4", "video/avi", "video/quicktime"];
   const MAX_SIZE = 10 * 1024 * 1024;
 
   useEffect(() => {
@@ -39,13 +38,19 @@ const SectionTwo: React.FC<SectionTwoProps> = ({
     if (!incoming) return;
 
     const valid: File[] = [];
+    let typeError = false;
     let sizeError = false;
 
     Array.from(incoming).forEach((file) => {
-      if (!ALLOWED_TYPES.includes(file.type)) return;
+      if (!file.type.startsWith("image/")) { typeError = true; return; }
       if (file.size > MAX_SIZE) { sizeError = true; return; }
       valid.push(file);
     });
+
+    if (typeError) {
+      setErrors((prev: any) => ({ ...prev, files: "Only image files (PNG, JPG, JPEG) are allowed" }));
+      return;
+    }
 
     if (sizeError) {
       setErrors((prev: any) => ({ ...prev, files: "Each file must be less than 10 MB" }));
@@ -196,37 +201,33 @@ const SectionTwo: React.FC<SectionTwoProps> = ({
       {data.hasEvidence === "yes" && (
         <div className="mb-4">
           <label className="fw-bold mb-1 d-block">
-            Upload photo/ Video <span className="text-danger">*</span>
+            Upload photo <span className="text-danger">*</span>
           </label>
           <p className="mb-1" style={{ fontSize: "14px" }}>
-            Photos/ videos should show the observed fireworks activity occuring.
+            Photos should show the observed fireworks activity occurring.
           </p>
           <p className="text-muted mb-2" style={{ fontSize: "13px" }}>
-            Select one or more PNG/JPG/MP4/JPEG/AVI/MOV files
+            Select one or more PNG/JPG/JPEG files
           </p>
 
           {/* Previews */}
           {previews.length > 0 && (
-            <div className="row mb-3">
+            <div className="d-flex flex-wrap gap-3 mb-3">
               {previews.map((src, i) => (
-                <div className="col-4 mb-2 text-center" key={i}>
-                  {data.files[i]?.type.startsWith("video/") ? (
-                    <video
-                      src={src}
-                      style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "8px" }}
-                    />
-                  ) : (
-                    <img
-                      src={src}
-                      alt="preview"
-                      style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "8px" }}
-                    />
-                  )}
+                <div key={i} style={{ position: "relative", width: "80px", height: "80px" }}>
+                  <img
+                    src={src}
+                    alt="preview"
+                    width={80}
+                    height={80}
+                    style={{ objectFit: "cover", borderRadius: "6px" }}
+                  />
                   <button
-                    className="btn btn-sm btn-danger mt-1"
+                    type="button"
+                    className="new-button"
                     onClick={() => removeFile(i)}
                   >
-                    Remove
+                    ×
                   </button>
                 </div>
               ))}
@@ -261,7 +262,7 @@ const SectionTwo: React.FC<SectionTwoProps> = ({
               type="file"
               className="d-none"
               multiple
-              accept=".png,.jpg,.jpeg,.mp4,.avi,.mov"
+              accept="image/*"
               onChange={(e) => addFiles(e.target.files)}
             />
           </div>

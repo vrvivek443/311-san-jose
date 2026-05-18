@@ -95,8 +95,7 @@ const CommunityWifi = () => {
         <AlertNavigation
           description={[
             "Your reference ID# is 260507-000018.",
-            "We'll also email you a confirmation.",
-            "The RAPID (Removing and Preventing Illegal Dumping) team will respond to reports of illegal dumping within 5 business days.",
+            "At this time your report will be used to inform future service upgrades."
           ]}
           primaryText="Track my report"
           onPrimary={() => navigate("/track-report")}

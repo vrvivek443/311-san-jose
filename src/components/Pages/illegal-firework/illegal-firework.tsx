@@ -65,7 +65,6 @@ const IllegalFirework = () => {
           description={[
             "Your reference ID# is 260507-000018.",
             "We'll also email you a confirmation.",
-            "The RAPID (Removing and Preventing Illegal Dumping) team will respond to reports of illegal dumping within 5 business days.",
           ]}
           primaryText="Track my report"
           onPrimary={() => navigate("/track-report")}

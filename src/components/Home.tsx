@@ -77,7 +77,7 @@ const lookingitems = [
     path: "https://sjhousingloans.my.site.com/s/tenantportalpage?language=en_US",
   },
   { img: eviction, label: "Eviction Prevention" },
-  { img: affordablehousing, label: "Affordable Housing" },
+  { img: affordablehousing, label: "Affordable Housing", path: "https://housing.sanjoseca.gov/" },
   { img: streetsweeping, label: "Street Sweeping" },
 ];
 

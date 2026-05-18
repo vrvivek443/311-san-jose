@@ -135,10 +135,34 @@ const StreetlightOutage = () => {
 
         <AlertNavigation
           description={[
-            "Your reference ID# is 260507-000018.",
-            "We'll also email you a confirmation.",
-            "Potholes (layer of asphalt missing with defined edges) are addressed in 2 business days. Repairs that are determined to be more complicated than a pothole can take up to 30 business days.",
-            "Please note: When you report a pothole that does not mean that the entire street will be re-paved.",
+            <>
+              Write down your reference ID#{" "}
+              <strong>260518-000005.</strong> Use it to track the status of
+              your report.
+            </>,
+            <>
+              Typical streetlight outages can be addressed in 16 business
+              days,{" "}
+              <strong>but are currently taking longer.</strong>
+            </>,
+            <>
+              <strong>Please note:</strong> Due to widespread streetlight
+              vandalism and copper wire theft, streetlight outages are
+              currently taking{" "}
+              <strong className="text-danger">
+                at least six months to repair.
+              </strong>{" "}
+              We are in the process of adding capacity to improve response
+              times. You can view our{" "}
+              <a
+                href="https://csj.maps.arcgis.com/apps/webappviewer/index.html?id=b3621648cdf24ccb9a837d57ecda06eb"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Streetlight Stolen Wire and Vandalism Incidents map
+              </a>{" "}
+              to see service requests and our progress.
+            </>,
           ]}
           primaryText="Track my report"
           onPrimary={() => navigate("/track-report")}

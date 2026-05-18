@@ -133,9 +133,9 @@ const OtherIssues = () => {
 
         <AlertNavigation
           description={[
-            "Your reference ID# is 260507-000018.",
-            "We'll also email you a confirmation.",
-            "The RAPID (Removing and Preventing Illegal Dumping) team will respond to reports of illegal dumping within 5 business days.",
+            "Write down your reference ID# 260518-000004. Use it to track the status of your report.",
+
+            "We usually respond within 2 business days.",
           ]}
           primaryText="Track my report"
           onPrimary={() => navigate("/track-report")}
@@ -206,14 +206,13 @@ const OtherIssues = () => {
         {/* Header */}
         <h4 className="fw-bold mb-4">Your Report</h4>
         <p className="text-muted">
-          This is for reporting and finding information about all other issues. Report concerns on private property here. Call 911 for emergencies.
+          This is for reporting and finding information about all other issues.
+          Report concerns on private property here. Call 911 for emergencies.
         </p>
 
         {/* Photo Upload Section */}
         <div className="mb-3">
-          <label className="fw-bold">
-            Add a Photo
-          </label>
+          <label className="fw-bold">Add a Photo</label>
           <p className="text-muted" style={{ fontSize: "13px" }}>
             Help us find it faster. Select any type of image format (Max 10MB
             each)
@@ -387,7 +386,6 @@ const OtherIssues = () => {
             <p className="text-danger mb-1">{errors.additionalInfo}</p>
           )}
         </div>
-
 
         {/* Submit */}
         <button className="next-btn w-100" onClick={handleSubmit}>
