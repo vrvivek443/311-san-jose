@@ -78,7 +78,7 @@ const lookingitems = [
   },
   { img: eviction, label: "Eviction Prevention" },
   { img: affordablehousing, label: "Affordable Housing", path: "https://housing.sanjoseca.gov/" },
-  { img: streetsweeping, label: "Street Sweeping" },
+  { img: streetsweeping, label: "Street Sweeping", path: "/street-sweeping" },
 ];
 
 const recyclingitems = [

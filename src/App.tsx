@@ -17,6 +17,7 @@ import SewageIssues from "./components/Pages/sewer-issues/sewer-issues";
 import StreetlightWarning from "./components/Pages/streetlight-outage/streelight-warning-alert";
 import CommunityWifiWarning from "./components/Pages/community-wifi/community-wifi-warning";
 import PayUtilityBills from "./components/Pages/Pay-Utility-Bills/pay-utility-bills";
+import StreetSweeping from "./components/Pages/street-sweeping/street-sweeping";
 
 function App() {
   const navigate = useNavigate();
@@ -154,6 +155,7 @@ function App() {
             <Route path="/sewer-issues" element={<SewageIssues />} />
             <Route path="/community-wifi-warning" element={<CommunityWifiWarning />} />
             <Route path="/pay-utility-bills" element={<PayUtilityBills />} />
+            <Route path="/street-sweeping" element={<StreetSweeping />} />
           </Routes>
 
         </div>
