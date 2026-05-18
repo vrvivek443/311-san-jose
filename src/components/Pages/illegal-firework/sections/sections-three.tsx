@@ -227,7 +227,7 @@ const SectionThree: React.FC<SectionThreeProps> = ({
 
       {/* Navigation */}
       <div className="d-flex gap-2 mt-3">
-        <button className="btn btn-outline-secondary w-50" onClick={onBack}>
+        <button className="back-btn w-50" onClick={onBack}>
           Back
         </button>
         <button className="next-btn w-50" onClick={handleNext}>

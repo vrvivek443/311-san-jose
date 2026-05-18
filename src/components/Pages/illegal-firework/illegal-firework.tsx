@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./illegal-firework.css";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
 import Modal from "../../shared/modal/modal";
 import SectionOne from "./sections/sections-one";
@@ -8,6 +9,7 @@ import SectionTwo from "./sections/sections-two";
 import type { SectionTwoData } from "./sections/sections-two";
 import SectionThree from "./sections/sections-three";
 import type { SectionThreeData } from "./sections/sections-three";
+import FinalReport from "./sections/final-report";
 
 const TOTAL_STEPS = 3;
 
@@ -130,8 +132,8 @@ const IllegalFirework = () => {
       </Modal>
 
       <div className="container mt-3 mb-4">
-        {/* Stepper */}
-        <div className="d-flex justify-content-center align-items-center mb-4 mt-2">
+        {/* Stepper — hidden on final review */}
+        {step <= TOTAL_STEPS && <div className="d-flex justify-content-center align-items-center mb-4 mt-2">
           {Array.from({ length: TOTAL_STEPS }, (_, i) => {
             const stepNum = i + 1;
             const isActive = step >= stepNum;
@@ -158,7 +160,7 @@ const IllegalFirework = () => {
               </React.Fragment>
             );
           })}
-        </div>
+        </div>}
 
         {/* Header */}
         <h4 className="fw-bold mb-4">My Illegal Fireworks Report</h4>
@@ -183,7 +185,16 @@ const IllegalFirework = () => {
             data={sectionThreeData}
             onChange={setSectionThreeData}
             onBack={() => setStep(2)}
-            onNext={handleSubmit}
+            onNext={() => setStep(4)}
+          />
+        )}
+        {step === 4 && (
+          <FinalReport
+            sectionOne={sectionOneData}
+            sectionTwo={sectionTwoData}
+            sectionThree={sectionThreeData}
+            onEdit={() => setStep(1)}
+            onSubmit={handleSubmit}
           />
         )}
 
