@@ -76,7 +76,7 @@ const lookingitems = [
     label: "Rent Registry Tenant Portal",
     path: "https://sjhousingloans.my.site.com/s/tenantportalpage?language=en_US",
   },
-  { img: eviction, label: "Eviction Prevention" },
+  { img: eviction, label: "Eviction Prevention", path: "/eviction-prevention-warning" },
   { img: affordablehousing, label: "Affordable Housing", path: "https://housing.sanjoseca.gov/" },
   { img: streetsweeping, label: "Street Sweeping", path: "/street-sweeping" },
 ];

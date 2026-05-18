@@ -18,6 +18,8 @@ import StreetlightWarning from "./components/Pages/streetlight-outage/streelight
 import CommunityWifiWarning from "./components/Pages/community-wifi/community-wifi-warning";
 import PayUtilityBills from "./components/Pages/Pay-Utility-Bills/pay-utility-bills";
 import StreetSweeping from "./components/Pages/street-sweeping/street-sweeping";
+import EvictionPreventionWarning from "./components/Pages/eviction-prevention/eviction-prevention-warning";
+import EvictionPrevention from "./components/Pages/eviction-prevention/eviction-prevention";
 
 function App() {
   const navigate = useNavigate();
@@ -156,6 +158,8 @@ function App() {
             <Route path="/community-wifi-warning" element={<CommunityWifiWarning />} />
             <Route path="/pay-utility-bills" element={<PayUtilityBills />} />
             <Route path="/street-sweeping" element={<StreetSweeping />} />
+            <Route path="/eviction-prevention-warning" element={<EvictionPreventionWarning />} />
+            <Route path="/eviction-prevention" element={<EvictionPrevention />} />
           </Routes>
 
         </div>

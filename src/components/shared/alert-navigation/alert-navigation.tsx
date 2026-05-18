@@ -12,6 +12,7 @@ interface AlertNavigationProps {
 }
 
 const AlertNavigation: React.FC<AlertNavigationProps> = ({
+  title,
   description,
   links,
   primaryText,
@@ -34,6 +35,18 @@ const AlertNavigation: React.FC<AlertNavigationProps> = ({
 
   return (
     <div className="container mt-4">
+      {title && (
+        <h4
+          className="fw-bold mb-4"
+          style={{
+            borderBottom: "2px solid #d4a017",
+            display: "inline-block",
+            paddingBottom: "4px",
+          }}
+        >
+          {title}
+        </h4>
+      )}
       <div className="card p-4 shadow-sm">
         {!descriptionBelow && descriptionBlock}
         {linksBlock}
