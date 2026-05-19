@@ -10,6 +10,7 @@ import type { SectionTwoData } from "./sections/sections-two";
 import SectionThree from "./sections/sections-three";
 import type { SectionThreeData } from "./sections/sections-three";
 import FinalReport from "./sections/final-report";
+import EditAll from "./sections/edit-all";
 
 const TOTAL_STEPS = 3;
 
@@ -192,8 +193,19 @@ const IllegalFirework = () => {
             sectionOne={sectionOneData}
             sectionTwo={sectionTwoData}
             sectionThree={sectionThreeData}
-            onEdit={() => setStep(1)}
+            onEdit={() => setStep(5)}
             onSubmit={handleSubmit}
+          />
+        )}
+        {step === 5 && (
+          <EditAll
+            sectionOne={sectionOneData}
+            sectionTwo={sectionTwoData}
+            sectionThree={sectionThreeData}
+            onSectionOneChange={setSectionOneData}
+            onSectionTwoChange={setSectionTwoData}
+            onSectionThreeChange={setSectionThreeData}
+            onSave={handleSubmit}
           />
         )}
 

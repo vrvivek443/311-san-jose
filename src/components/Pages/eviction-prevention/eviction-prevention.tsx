@@ -11,6 +11,7 @@ import type { SectionFourData } from "./sections/section-four";
 import SectionFive from "./sections/section-five";
 import type { SectionFiveData } from "./sections/section-five";
 import FinalReport from "./sections/final-report";
+import EditAll from "./sections/edit-all";
 import AlertNavigation from "../../shared/alert-navigation/alert-navigation";
 
 const TOTAL_STEPS = 5;
@@ -76,7 +77,7 @@ const EvictionPrevention = () => {
       )}
 
       {/* Header */}
-      {step < 7 && (
+      {(step < 7 || step === 8) && (
         <h4 className="fw-bold mb-4 ep-heading">
           {step === 1 ? "Eviction Prevention" : "Eviction Prevention Assistance Request"}
         </h4>
@@ -126,8 +127,21 @@ const EvictionPrevention = () => {
           sectionThree={sectionThreeData}
           sectionFour={sectionFourData}
           sectionFive={sectionFiveData}
-          onEdit={() => setStep(1)}
+          onEdit={() => setStep(8)}
           onSubmit={() => setStep(7)}
+        />
+      )}
+      {step === 8 && (
+        <EditAll
+          sectionTwo={sectionTwoData}
+          sectionThree={sectionThreeData}
+          sectionFour={sectionFourData}
+          sectionFive={sectionFiveData}
+          onSectionTwoChange={setSectionTwoData}
+          onSectionThreeChange={setSectionThreeData}
+          onSectionFourChange={setSectionFourData}
+          onSectionFiveChange={setSectionFiveData}
+          onSave={() => setStep(7)}
         />
       )}
       {step === 7 && (
